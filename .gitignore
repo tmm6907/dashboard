@@ -3,6 +3,7 @@
 #
 # Binaries for programs and plugins
 *.exe
+**/server
 *.exe~
 *.dll
 *.so
@@ -38,6 +39,5 @@ src/client/.astro/
 src/client/npm-debug.log*
 *.db
 **/*.db
-src/api/mashboard.db
-src/api/mashboard.db-shm
-src/api/mashboard.db-wal
+**/*.db-shm
+**/*.db-wal
