@@ -48,20 +48,27 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	feedUUID := uuid.New()
 	feedID := feedUUID[:]
 
+	feedLink := request["link"].(string)
+	if utils.IsYoutubeChannelURL(feedLink) {
+		link, err := utils.GetYouTubeRSS(feedLink)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		feedLink = link
+	}
+
 	if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
-		feedID, request["title"], request["link"], request["description"], request["language"]); err != nil {
+		feedID, request["title"], feedLink, request["description"], request["language"]); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return nil
 }
 
-// LoginHandler redirects to Google OAuth /login
 func (h *Handler) LoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
 	return c.Redirect(url, http.StatusFound)
 }
 
-// CallbackHandler handles Google OAuth callback
 func (h *Handler) CallbackHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		code := c.Query("code", "")
