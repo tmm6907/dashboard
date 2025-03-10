@@ -18,8 +18,21 @@
 # vendor/
 
 # Go workspace file
-go.work
-go.work.sum
+src/api/go.work
+src/api/go.work.sum
 
 # env file
 .env
+.env.production
+
+src/client/node_modules/
+
+
+# build output
+src/client/dist/
+
+# generated types
+src/client/.astro/
+
+# logs
+src/client/npm-debug.log*

@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: src/api
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+    ports:
+      - "8080:8080"
+
+  client:
+    build:
+      context: src/client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy_server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - server
+      - client
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:

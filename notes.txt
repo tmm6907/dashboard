@@ -1,0 +1,3 @@
+When handling youtube clientside, pull image from link page. Example:
+<meta property="og:image" content="https://i.ytimg.com/vi/xsviypz8yEs/maxresdefault.jpg">
+<meta property="og:image" content="https://www.billboard.com/wp-content/uploads/2025/02/2025-fea-clive-davis-pre-grammy-gala-doechii-BB-2025-issue-3-sami-drasin-14-1240.jpg?w=1024">

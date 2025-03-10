@@ -1,0 +1,11 @@
+{
+    auto_https off
+}
+
+# Serve Astro frontend
+http://localhost {
+    reverse_proxy dashboard-client:80
+    handle /api/* {
+        reverse_proxy server:8080
+    }
+}
