@@ -36,3 +36,8 @@ src/client/.astro/
 
 # logs
 src/client/npm-debug.log*
+*.db
+**/*.db
+src/api/mashboard.db
+src/api/mashboard.db-shm
+src/api/mashboard.db-wal
