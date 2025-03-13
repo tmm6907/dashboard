@@ -49,10 +49,13 @@ func getFeedFromChannelID(channelID string) string {
 }
 
 func GetYouTubeRSS(channelURL string) (string, error) {
-	handleRegex := regexp.MustCompile(`https?://(?:www\.)?youtube\.com/@([a-zA-Z0-9_-]+)`)
-	customRegex := regexp.MustCompile(`https?://(www\.)?youtube\.com/c/[a-zA-Z0-9_-]+`)
-	channelIDRegex := regexp.MustCompile(`https?://(www\.)?youtube\.com/channel/[A-Za-z0-9_-]+`)
-	userRegex := regexp.MustCompile(`https?://(www\.)?youtube\.com/user/[a-zA-Z0-9_-]+`)
+	if strings.Contains(channelURL, "https://www.youtube.com/feeds/") {
+		return channelURL, nil
+	}
+	handleRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:www\.)?youtube\.com/@([a-zA-Z0-9_-]+)(?:/|$)`)
+	customRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/c/[a-zA-Z0-9_-]+`)
+	channelIDRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/channel/[A-Za-z0-9_-]+`)
+	userRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/user/[a-zA-Z0-9_-]+`)
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
 	if apiKey == "" {
 		return "", errors.New("missing api key")
@@ -97,6 +100,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 		}
 
 		channelID = id
+		break
 
 	case customRegex.MatchString(channelURL):
 		identifier, err := ExtractChannelID(channelURL)

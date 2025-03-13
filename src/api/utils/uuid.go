@@ -10,6 +10,11 @@ import (
 
 type UUID []byte
 
+// func (u *UUID) UnmarshalText(text []byte) error {
+// 	*u = UUID(text)
+// 	return nil
+// }
+
 func (u UUID) MarshalJSON() ([]byte, error) {
 	id, err := uuid.FromBytes(u)
 	if err != nil {

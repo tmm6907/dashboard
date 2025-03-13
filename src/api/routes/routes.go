@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"sort"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -28,9 +30,26 @@ func (h *Handler) GetAllFeeds(c *fiber.Ctx) error {
 func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 	var feedItems []models.FeedItem
 	db := h.GetDB()
+	UUIDString := c.Query("feedID")
+	if UUIDString != "" {
+		feedID, err := h.ParseUUIDString(UUIDString)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		db := h.GetDB()
+		if err := db.Select(&feedItems, "SELECT * FROM feed_items WHERE feed_id = ? order by id desc;", feedID); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	}
 	if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
+
+	sort.Slice(feedItems, func(i, j int) bool {
+		return time.Time(feedItems[i].PubDate).After(time.Time(feedItems[j].PubDate))
+	})
+	log.Debug(len(feedItems))
+
 	return c.JSON(map[string]any{
 		"feeds": feedItems,
 	})
@@ -49,6 +68,7 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	feedID := feedUUID[:]
 
 	feedLink := request["link"].(string)
+
 	if utils.IsYoutubeChannelURL(feedLink) {
 		link, err := utils.GetYouTubeRSS(feedLink)
 		if err != nil {
@@ -57,11 +77,23 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 		feedLink = link
 	}
 
+	if !h.ValidateURL(feedLink) {
+		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
+	}
+
 	if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
 		feedID, request["title"], feedLink, request["description"], request["language"]); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return nil
+}
+
+func (h *Handler) GetFeedItemsByFeedID(c *fiber.Ctx) error {
+	var feedItems []models.FeedItem
+
+	return c.JSON(map[string]any{
+		"feeds": feedItems,
+	})
 }
 
 func (h *Handler) LoginHandler(c *fiber.Ctx) error {
@@ -114,7 +146,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 			return c.Status(http.StatusInternalServerError).SendString("Database error")
 		}
 
-		token, err := utils.GenerateToken(oauthID)
+		token, err := h.GenerateJWTToken(oauthID)
 		if err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString("Unable to generate auth token")

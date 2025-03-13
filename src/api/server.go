@@ -57,7 +57,7 @@ func main() {
 
 	err = godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 
 	var GoogleOAuthConfig = &oauth2.Config{
@@ -75,6 +75,7 @@ func main() {
 	apiRoutes.Get("/feeds", routesHandler.GetAllFeeds)
 	apiRoutes.Post("/feeds", routesHandler.CreateFeed)
 	apiRoutes.Get("/feeds/items", routesHandler.GetFeedItems)
+	apiRoutes.Get("/feeds/items/:feedID", routesHandler.GetFeedItemsByFeedID)
 
 	authRoutes := server.Group("/auth")
 	authRoutes.Get("/login", routesHandler.LoginHandler)
@@ -83,7 +84,11 @@ func main() {
 	server.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.JSON(
 			map[string]any{
-				"endpoints": []string{"/feeds"},
+				"endpoints": []string{
+					"/auth/login",
+					"/feeds",
+					"/feeds/items",
+				},
 			},
 		)
 	})

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     oauth_provider TEXT NOT NULL,
     first_name TEXT,
     last_name TEXT,
+    ktn_email TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -12,6 +13,8 @@ CREATE TABLE IF NOT EXISTS feeds  (
     feed_id BLOB NOT NULL UNIQUE,
     title TEXT NOT NULL,
     link TEXT NOT NULL,
+    image TEXT DEFAULT "",
+    media_type TEXT DEFAULT "",
     description TEXT,
     language TEXT,
     last_build_date TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -25,6 +28,7 @@ CREATE TABLE IF NOT EXISTS feed_items (
     link TEXT NOT NULL UNIQUE,
     description TEXT,
     image TEXT, 
+    media_type TEXT,
     pub_date TEXT DEFAULT CURRENT_TIMESTAMP,
     guid TEXT UNIQUE,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,

@@ -9,6 +9,8 @@ type Feed struct {
 	FeedID        utils.UUID      `db:"feed_id" json:"feedId"`
 	Title         string          `db:"title" json:"title"`
 	Link          string          `db:"link" json:"link"`
+	Image         string          `db:"image" json:"image"`
+	MediaType     string          `db:"media_type" json:"mediaType"`
 	Description   string          `db:"description" json:"description"`
 	Language      string          `db:"language" json:"language"`
 	LastBuildDate string          `db:"last_build_date" json:"lastBuildDate"`
