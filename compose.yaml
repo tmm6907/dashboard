@@ -15,7 +15,7 @@ services:
       context: src/client
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3030:80"
     depends_on:
       - server
 
@@ -33,6 +33,15 @@ services:
       - server
       - client
     restart: unless-stopped
+
+  ktn:
+    build:
+      context: src/kill-the-newsletter
+      dockerfile: Dockerfile
+    ports:
+      - "0000:3000"
+    depends_on:
+      - caddy
 
 volumes:
   caddy_data:
