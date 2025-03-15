@@ -1,5 +1,9 @@
 version: "3.8"
 
+networks:
+  internal:
+
+
 services:
   server:
     build:
@@ -9,41 +13,50 @@ services:
       - PORT=8080
     ports:
       - "8080:8080"
+    volumes:
+      - api_db:/src/api/mashboard.db
+      - api_db_shm:/src/api/mashboard.db-shm
+      - api_db_wal:/src/api/mashboard.db-wal
+    networks:
+      - internal
 
-  client:
+  mail:
     build:
-      context: src/client
+      context: src/mailserver
       dockerfile: Dockerfile
     ports:
-      - "3030:80"
-    depends_on:
-      - server
+      - "25:2525"
+      - "8888:8888"
+
+    volumes:
+      - mail_db:/src/mailserver/mail.db
+    networks:
+      - internal
 
   caddy:
-    image: caddy:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: caddy_server
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./src/client/dist:/dist
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
       - server
-      - client
+      - mail
     restart: unless-stopped
-
-  ktn:
-    build:
-      context: src/kill-the-newsletter
-      dockerfile: Dockerfile
-    ports:
-      - "0000:3000"
-    depends_on:
-      - caddy
+    networks:
+      - internal
 
 volumes:
   caddy_data:
   caddy_config:
-  postgres_data:
+  api_db:
+  api_db_shm:
+  api_db_wal:
+  mail_db:

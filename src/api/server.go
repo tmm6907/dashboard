@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -60,6 +61,12 @@ func main() {
 		log.Error(err)
 	}
 
+	server.Use(cors.New(cors.Config{
+		AllowOrigins: "*", // Allow all origins
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+	}))
+
 	var GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
@@ -75,8 +82,6 @@ func main() {
 	apiRoutes.Get("/feeds", routesHandler.GetAllFeeds)
 	apiRoutes.Post("/feeds", routesHandler.CreateFeed)
 	apiRoutes.Get("/feeds/items", routesHandler.GetFeedItems)
-	apiRoutes.Get("/feeds/items/:feedID", routesHandler.GetFeedItemsByFeedID)
-
 	authRoutes := server.Group("/auth")
 	authRoutes.Get("/login", routesHandler.LoginHandler)
 	authRoutes.Get("/callback", routesHandler.CallbackHandler())

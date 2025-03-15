@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/mail"
+	"os"
 	"strings"
 	"time"
 
@@ -67,8 +68,24 @@ func (s *Session) Logout() error {
 
 type Backend struct{}
 
+func populateDB(db *sqlx.DB) error {
+
+	file, err := os.ReadFile("./build.sql")
+	if err != nil {
+		return err
+	}
+	if _, err = db.Exec(string(file)); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b Backend) NewSession(c *smtp.Conn) (smtp.Session, error) {
 	db, err := sqlx.Open("sqlite", "mail.db")
+	if err != nil {
+		return &Session{}, err
+	}
+	err = populateDB(db)
 	if err != nil {
 		return &Session{}, err
 	}

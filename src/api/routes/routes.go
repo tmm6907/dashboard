@@ -42,6 +42,7 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 		}
 	}
 	if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
+		log.Error(err)
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
@@ -88,14 +89,6 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	return nil
 }
 
-func (h *Handler) GetFeedItemsByFeedID(c *fiber.Ctx) error {
-	var feedItems []models.FeedItem
-
-	return c.JSON(map[string]any{
-		"feeds": feedItems,
-	})
-}
-
 func (h *Handler) LoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
 	return c.Redirect(url, http.StatusFound)
@@ -129,10 +122,13 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 		err = db.QueryRow("SELECT id FROM users WHERE oauth_id = ? AND oauth_provider = 'google'", oauthID).
 			Scan(&userID)
 
+		newUUID := uuid.New()
+		mashboardEmail := newUUID.String() + "@mash.board"
+
 		if err == sql.ErrNoRows {
 			// Insert new user
-			res, err := db.Exec("INSERT INTO users (oauth_provider, oauth_id, first_name, last_name) VALUES (?, ?, ?, ?)",
-				"google", oauthID, firstName, lastName)
+			res, err := db.Exec("INSERT INTO users (oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?)",
+				"google", oauthID, firstName, lastName, mashboardEmail)
 			if err != nil {
 				log.Error("Failed to insert user:", err)
 				return c.Status(http.StatusInternalServerError).SendString("User creation failed")

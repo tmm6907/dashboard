@@ -6,6 +6,8 @@ export default defineConfig({
     server: {
         port: 3030,
     },
+    output: 'static',
+    site: 'http://localhost:8080',
     vite: {
         server: {
             watch: {

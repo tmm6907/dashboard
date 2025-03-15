@@ -7,12 +7,4 @@ CREATE TABLE IF NOT EXISTS mail (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
-EHLO localhost
-MAIL FROM:<test@example.com>
-RCPT TO:<recipient@example.com>
-DATA
-Subject: Test Email
 
-This is a test email.
-.
-QUIT

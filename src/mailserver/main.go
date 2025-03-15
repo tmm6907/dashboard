@@ -17,9 +17,10 @@ func main() {
 	if mailServer == nil {
 		log.Fatalln("Failed to make mail server")
 	}
-	mail.ConfigureServer(mailServer, ":2525", "example.com", 10*time.Second, 10*time.Second, true)
+	smtpPort := ":2525"
+	mail.ConfigureServer(mailServer, smtpPort, "example.com", 10*time.Second, 10*time.Second, true)
 
-	log.Println("Starting SMTP server on :2525")
+	log.Println("Starting SMTP server on", smtpPort)
 	go func(m *smtp.Server) {
 		listener, err := net.Listen("tcp", m.Addr)
 		if err != nil {

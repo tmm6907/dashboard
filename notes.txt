@@ -11,3 +11,13 @@ plyr for videoplayer/audio
 2025/03/11 21:20:52.808244 workers.go:111: [Info] Fetching RSS Feed for url: https://news.google.com/rss/search?q=when:24h+allinurl:apnews.com&hl=en-US&gl=US&ceid=US:en ...
 2025/03/11 21:20:52.808452 workers.go:111: [Info] Fetching RSS Feed for url: https://jbpod.libsyn.com/applepodcast ...
 2025/03/11 21:20:52.808484 workers.go:111: [Info] Fetching RSS Feed for url: https://feed.syntax.fm/ ...
+
+EHLO localhost
+MAIL FROM:<test@example.com>
+RCPT TO:<recipient@example.com>
+DATA
+Subject: Test Email
+
+This is a test email.
+.
+QUIT
