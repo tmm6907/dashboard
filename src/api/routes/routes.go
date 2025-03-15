@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"sort"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -28,9 +30,27 @@ func (h *Handler) GetAllFeeds(c *fiber.Ctx) error {
 func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 	var feedItems []models.FeedItem
 	db := h.GetDB()
+	UUIDString := c.Query("feedID")
+	if UUIDString != "" {
+		feedID, err := h.ParseUUIDString(UUIDString)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		db := h.GetDB()
+		if err := db.Select(&feedItems, "SELECT * FROM feed_items WHERE feed_id = ? order by id desc;", feedID); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	}
 	if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
+		log.Error(err)
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
+
+	sort.Slice(feedItems, func(i, j int) bool {
+		return time.Time(feedItems[i].PubDate).After(time.Time(feedItems[j].PubDate))
+	})
+	log.Debug(len(feedItems))
+
 	return c.JSON(map[string]any{
 		"feeds": feedItems,
 	})
@@ -48,20 +68,32 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	feedUUID := uuid.New()
 	feedID := feedUUID[:]
 
+	feedLink := request["link"].(string)
+
+	if utils.IsYoutubeChannelURL(feedLink) {
+		link, err := utils.GetYouTubeRSS(feedLink)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		feedLink = link
+	}
+
+	if !h.ValidateURL(feedLink) {
+		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
+	}
+
 	if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
-		feedID, request["title"], request["link"], request["description"], request["language"]); err != nil {
+		feedID, request["title"], feedLink, request["description"], request["language"]); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return nil
 }
 
-// LoginHandler redirects to Google OAuth /login
 func (h *Handler) LoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
 	return c.Redirect(url, http.StatusFound)
 }
 
-// CallbackHandler handles Google OAuth callback
 func (h *Handler) CallbackHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		code := c.Query("code", "")
@@ -90,10 +122,13 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 		err = db.QueryRow("SELECT id FROM users WHERE oauth_id = ? AND oauth_provider = 'google'", oauthID).
 			Scan(&userID)
 
+		newUUID := uuid.New()
+		mashboardEmail := newUUID.String() + "@mash.board"
+
 		if err == sql.ErrNoRows {
 			// Insert new user
-			res, err := db.Exec("INSERT INTO users (oauth_provider, oauth_id, first_name, last_name) VALUES (?, ?, ?, ?)",
-				"google", oauthID, firstName, lastName)
+			res, err := db.Exec("INSERT INTO users (oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?)",
+				"google", oauthID, firstName, lastName, mashboardEmail)
 			if err != nil {
 				log.Error("Failed to insert user:", err)
 				return c.Status(http.StatusInternalServerError).SendString("User creation failed")
@@ -107,7 +142,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 			return c.Status(http.StatusInternalServerError).SendString("Database error")
 		}
 
-		token, err := utils.GenerateToken(oauthID)
+		token, err := h.GenerateJWTToken(oauthID)
 		if err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString("Unable to generate auth token")

@@ -4,8 +4,31 @@
 
 # Serve Astro frontend
 http://localhost {
-    reverse_proxy dashboard-client:80
+    root * /dist
+    file_server
+    
     handle /api/* {
         reverse_proxy server:8080
+        header Access-Control-Allow-Origin *
+        header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+}
+
+mail.localhost.com {
+    tls internal
+
+    @smtp {
+        protocol smtp
+    }
+
+    handle @smtp {
+        reverse_proxy mail:25
+    }
+}
+
+:25 {
+    handle {
+        reverse_proxy mail:25
     }
 }

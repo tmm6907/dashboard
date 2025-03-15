@@ -1,36 +1,121 @@
 package worker
 
 import (
+	"fmt"
+	"net/http"
+	"slices"
 	"sync"
 	"time"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/mmcdole/gofeed"
 	"github.com/tmm6907/dashboard/models"
+	"golang.org/x/net/html"
 )
 
-func (h *Handler) FecthRSSFeed(feed models.Feed) error {
+func getOGImage(url string) (string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Parse the HTML
+	tokenizer := html.NewTokenizer(resp.Body)
+
+	for {
+		tt := tokenizer.Next()
+
+		switch tt {
+		case html.ErrorToken:
+			// End of document
+			return "", fmt.Errorf("og:image not found")
+		case html.StartTagToken, html.SelfClosingTagToken:
+			token := tokenizer.Token()
+			if token.Data == "meta" {
+				// Check attributes for property="og:image"
+				var content string
+				for _, attr := range token.Attr {
+					if attr.Key == "property" && attr.Val == "og:image" {
+						// Once we find property="og:image", get the content attribute
+						for _, attr := range token.Attr {
+							if attr.Key == "content" {
+								content = attr.Val
+								return content, nil
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 	rssParser := gofeed.NewParser()
 	rssFeed, err := rssParser.ParseURL(feed.Link)
 	if err != nil {
 		return err
 	}
+
 	db := h.GetDB()
+	feedImage := ""
+	if rssFeed.Image != nil && feed.Image == "" {
+
+		feedImage = rssFeed.Image.URL
+		if _, err := db.Exec("UPDATE feeds SET image = ? WHERE id = ?;", feedImage, feed.ID); err != nil {
+			return err
+		}
+	}
+	mediaType := []string{}
+
 	for _, item := range rssFeed.Items {
-		image := ""
+		image := feedImage
+		if len(item.Enclosures) > 0 {
+			media := item.Enclosures[0]
+			if !slices.Contains(mediaType, media.Type) {
+				mediaType = append(mediaType, media.Type)
+			}
+		}
 		if item.Image != nil {
 			image = item.Image.URL
 		}
-		if _, err = db.Exec("INSERT OR IGNORE INTO feed_items(feed_id, title, link, description, image, guid, pub_date) VALUES (?, ?, ?, ?, ?, ?, ?);", feed.FeedID, item.Title, item.Link, item.Description, image, item.GUID, item.Published); err != nil {
+		var feedItem models.FeedItem
+		err := db.Get(&feedItem, "SELECT * FROM feed_items WHERE guid = ?;", item.GUID)
+		if err != nil {
+			if image == "" {
+				image, _ = getOGImage(item.Link)
+				if image == "" && feedImage != "" {
+					image = feedImage
+				}
+			}
+			if _, err = db.Exec(
+				"INSERT OR IGNORE INTO feed_items (feed_id, title, link, description, image, guid, pub_date) VALUES (?, ?, ?, ?, ?, ?, ?);",
+				feed.FeedID, item.Title, item.Link, item.Description, image, item.GUID, item.Published,
+			); err != nil {
+				return err
+			}
+		} else {
+			if feedItem.Image == "" {
+				if image != "" {
+					if _, err := db.Exec("UPDATE feed_items SET image = ? WHERE id = ?", image, feedItem.ID); err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+	if len(mediaType) >= 1 {
+		log.Debug("Media types: ", mediaType)
+		if _, err := db.Exec("UPDATE feeds SET media_type = ? WHERE id = ?;", mediaType[0], feed.ID); err != nil {
 			return err
 		}
-
 	}
 
 	return nil
 }
 
-func (h *Handler) FecthRSSFeeds() {
+func (h *Handler) FetchRSSFeeds() {
 	var feeds []models.Feed
 	db := h.GetDB()
 
@@ -47,7 +132,7 @@ func (h *Handler) FecthRSSFeeds() {
 			defer wg.Done()
 			for f := range feedChan {
 				log.Info("Fetching RSS Feed for url: ", f.Link, " ...")
-				if err := h.FecthRSSFeed(f); err != nil {
+				if err := h.FetchRSSFeed(f); err != nil {
 					log.Error(err)
 				}
 			}
@@ -71,7 +156,7 @@ func (h *Handler) StartRSSFetcher(interval *time.Duration) {
 		select {
 		case <-ticker.C:
 			log.Info("Fetching RSS Feeds...")
-			h.FecthRSSFeeds()
+			h.FetchRSSFeeds()
 		}
 	}
 }
