@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark, cupcake;
+}
+
+@plugin "@tailwindcss/typography";
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+    margin-top: 0.25em;
+    margin-bottom: 0.5em;
+}
+
+.slide-in {
+    transform: translateY(60vh);
+    transition:
+        transform 0.5s ease-in;
+}
+
+.slide-out {
+    transform: translateY(120vh);
+    transition:
+        transform 0.5s ease-in;
+}
