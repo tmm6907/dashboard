@@ -1,5 +1,3 @@
-version: "3.8"
-
 networks:
   internal:
 
@@ -13,10 +11,10 @@ services:
       - PORT=8080
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     volumes:
-      - api_db:/src/api/mashboard.db
-      - api_db_shm:/src/api/mashboard.db-shm
-      - api_db_wal:/src/api/mashboard.db-wal
+      - api_db:/src/api/db
     networks:
       - internal
 
@@ -43,7 +41,7 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./src/client/dist:/dist
+      - ./src/client/build:/dist
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -57,6 +55,4 @@ volumes:
   caddy_data:
   caddy_config:
   api_db:
-  api_db_shm:
-  api_db_wal:
   mail_db:
