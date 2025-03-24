@@ -41,3 +41,8 @@ src/client/npm-debug.log*
 **/*.db
 **/*.db-shm
 **/*.db-wal
+
+*.sqlite
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
