@@ -18,17 +18,16 @@
     };
 </script>
 
-<div class="flex flex-col text-base-content pb-4 max-w-[48ch]">
+<div class="text-base-content pb-4 min-w-[32ch] max-w-[60ch]">
     <img
         src={item.image
             ? item.image
             : "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
         alt={item.altText ? item.altText : "feed item"}
         loading="lazy"
-        class="h-48 w-full"
-        style=" margin-inline: auto; object-fit:cover;"
+        class="h-48 w-full object-fill"
     />
-    <span>{item.title}</span>
+    <span class=" text-wrap line-clamp-2">{item.title}</span>
     <div class="prose">
         <span class="text-secondary">{podcast}</span> |
         <span>{getTimeAgo(item.pubDate)}</span>

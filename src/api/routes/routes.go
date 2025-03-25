@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -43,10 +44,14 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 	}
 	userID, err := h.GetUserIDFromToken(token)
 	if err != nil {
+		if strings.Contains(err.Error(), "token is expired") {
+			return c.Redirect("http://localhost:8080/auth/login")
+		}
 		log.Error(err)
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	UUIDString := c.Query("feedID")
+	category := strings.ToLower(c.Query("category"))
 	if UUIDString != "" {
 		feedID, err := h.ParseUUIDString(UUIDString)
 		if err != nil {
@@ -57,10 +62,19 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	}
-	if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	if category != "" && category != "all" && category != "all categories" {
+		log.Debug(category)
+		if err := db.Select(&feedItems, "SELECT * FROM feed_items WHERE categories LIKE ?;", "%"+category+"%"); err != nil {
+			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	} else {
+		if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
+			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
 	}
+
 	log.Debug(len(feedItems))
 
 	sort.Slice(feedItems, func(i, j int) bool {
@@ -134,8 +148,9 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	feedID := feedUUID[:]
 
 	feedLink := request["link"].(string)
-
+	isYoutube := false
 	if utils.IsYoutubeChannelURL(feedLink) {
+		isYoutube = true
 		link, err := utils.GetYouTubeRSS(feedLink)
 		if err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -146,11 +161,18 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	if !h.ValidateURL(feedLink) {
 		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
 	}
-
-	if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
-		feedID, request["title"], feedLink, request["description"], request["language"]); err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	if isYoutube {
+		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language, categories, media_type) VALUES (?, ?, ?, ?, ?, ?, ?);",
+			feedID, request["title"], feedLink, request["description"], request["language"], "youtube", "video"); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	} else {
+		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
+			feedID, request["title"], feedLink, request["description"], request["language"]); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
 	}
+
 	return nil
 }
 
@@ -199,6 +221,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 		// Extract relevant details
 		oauthID, ok := userInfo["id"].(string)
 		if !ok {
+			log.Error("Invalid user id")
 			return c.Status(http.StatusInternalServerError).SendString("Invalid user ID")
 		}
 		firstName, _ := userInfo["given_name"].(string) // First name

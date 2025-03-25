@@ -13,6 +13,7 @@ type FeedItem struct {
 	Image       string          `db:"image" json:"image"`
 	AltText     string          `db:"alt_text" json:"altText"`
 	MediaType   string          `db:"media_type" json:"mediaType"`
+	Categories  string          `db:"categories" json:"categories"`
 	PubDate     utils.Timestamp `db:"pub_date" json:"pubDate"`
 	GUID        string          `db:"guid" json:"guid"`
 	CreatedAt   utils.Timestamp `db:"created_at" json:"createdAt"`

@@ -11,8 +11,9 @@ type Feed struct {
 	Image         string          `db:"image" json:"image"`
 	AltText       string          `db:"alt_text" json:"altText"`
 	MediaType     string          `db:"media_type" json:"mediaType"`
+	Categories    string          `db:"categories" json:"categories"`
 	Description   string          `db:"description" json:"description"`
 	Language      string          `db:"language" json:"language"`
-	LastBuildDate string          `db:"last_build_date" json:"lastBuildDate"`
+	LastBuildDate utils.Timestamp `db:"last_build_date" json:"lastBuildDate"`
 	CreatedAt     utils.Timestamp `db:"created_at" json:"createdAt"`
 }
