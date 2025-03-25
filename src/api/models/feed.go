@@ -5,11 +5,11 @@ import (
 )
 
 type Feed struct {
-	ID            uint            `db:"id" json:"id"`
 	FeedID        utils.UUID      `db:"feed_id" json:"feedId"`
 	Title         string          `db:"title" json:"title"`
 	Link          string          `db:"link" json:"link"`
 	Image         string          `db:"image" json:"image"`
+	AltText       string          `db:"alt_text" json:"altText"`
 	MediaType     string          `db:"media_type" json:"mediaType"`
 	Description   string          `db:"description" json:"description"`
 	Language      string          `db:"language" json:"language"`

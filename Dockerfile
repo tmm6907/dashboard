@@ -11,10 +11,13 @@ WORKDIR /build
 RUN xcaddy build --with github.com/mholt/caddy-l4
 
 # --- Final Stage ---
-FROM alpine:latest as final
+FROM alpine:latest AS final
+
+RUN apk add nss-tools
 
 # Copy the Caddy binary from the build stage
 COPY --from=build /build/caddy /usr/bin/caddy
+
 
 # Expose Caddy ports
 EXPOSE 80 443 25

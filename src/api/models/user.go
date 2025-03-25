@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID            uint            `db:"id" json:"id"`
+	ID            utils.UUID      `db:"id" json:"id"`
 	OAuthID       string          `db:"oauth_id" json:"oathID"`
 	OAuthProvider string          `db:"oauth_provider" json:"oathProvider"`
 	FirstName     string          `db:"first_name" json:"firstName"`

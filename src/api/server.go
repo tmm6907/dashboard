@@ -17,24 +17,41 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false // File does not exist
+		}
+	}
+	if info.IsDir() {
+		log.Debug("is a dir2ectory")
+		return false
+	}
+	return !info.IsDir() // Returns false if it's a directory
+}
+
 func initDB() (*sqlx.DB, error) {
-	dbName := "mashboard.db"
+	dbName := "mashboard.sqlite"
 	buildFile := "build.sql"
-	buildCommands := []string{
+	pragmaCommands := []string{
 		"PRAGMA load_extension = 1;",
 		"PRAGMA journal_mode=WAL;",
 		"PRAGMA foreign_keys=1;",
 	}
-	buildCommand := strings.Join(buildCommands, " ")
+	pragmaCommand := strings.Join(pragmaCommands, " ")
+
 	db, err := sqlx.Open("sqlite3", dbName)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to open mashboard connection: %w", err)
 	}
-
-	if _, err := db.Exec(buildCommand); err != nil {
-		return nil, fmt.Errorf("Unable to run build commands: %w", err)
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("Unable to ping mashboard connection: %w", err)
 	}
 
+	if _, err := db.Exec(pragmaCommand); err != nil {
+		return nil, fmt.Errorf("Unable to run PRAGMA commands: %w", err)
+	}
 	sqlData, err := os.ReadFile(buildFile)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to open build file: %w", err)
@@ -48,24 +65,32 @@ func initDB() (*sqlx.DB, error) {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Error(err)
+	}
+
 	server := fiber.New()
 	db, err := initDB()
 	if err != nil {
-		log.Error(err)
-		panic(err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Error(err)
+	server.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3030, http://localhost:8080, http://localhost", // Allow all origins
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials: true,
+	}))
+	client_id := os.Getenv("GOOGLE_CLIENT_ID")
+	if client_id == "" {
+		log.Fatal("Missing google client id")
 	}
 
-	server.Use(cors.New(cors.Config{
-		AllowOrigins: "*", // Allow all origins
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-	}))
+	client_secret := os.Getenv("GOOGLE_CLIENT_SECRET")
+	if client_secret == "" {
+		log.Fatal("Missing google client secret")
+	}
 
 	var GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
@@ -79,11 +104,13 @@ func main() {
 	workerHandler := worker.NewHandler(db)
 
 	apiRoutes := server.Group("/api")
-	apiRoutes.Get("/feeds", routesHandler.GetAllFeeds)
+	apiRoutes.Get("/feeds", routesHandler.GetFeeds)
 	apiRoutes.Post("/feeds", routesHandler.CreateFeed)
 	apiRoutes.Get("/feeds/items", routesHandler.GetFeedItems)
 	authRoutes := server.Group("/auth")
+	authRoutes.Get("/", routesHandler.CheckAuth)
 	authRoutes.Get("/login", routesHandler.LoginHandler)
+	authRoutes.Get("/logout", routesHandler.Logout)
 	authRoutes.Get("/callback", routesHandler.CallbackHandler())
 
 	server.Get("/", func(ctx *fiber.Ctx) error {
@@ -91,8 +118,8 @@ func main() {
 			map[string]any{
 				"endpoints": []string{
 					"/auth/login",
-					"/feeds",
-					"/feeds/items",
+					"/api/feeds",
+					"/api/feeds/items",
 				},
 			},
 		)

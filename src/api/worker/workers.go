@@ -60,10 +60,11 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 
 	db := h.GetDB()
 	feedImage := ""
+	feedAlt := ""
 	if rssFeed.Image != nil && feed.Image == "" {
-
 		feedImage = rssFeed.Image.URL
-		if _, err := db.Exec("UPDATE feeds SET image = ? WHERE id = ?;", feedImage, feed.ID); err != nil {
+		feedAlt = rssFeed.Image.Title
+		if _, err := db.Exec("UPDATE feeds SET image = ?, alt_text = ? WHERE feed_id = ?;", feedImage, feedAlt, feed.FeedID); err != nil {
 			return err
 		}
 	}
@@ -71,6 +72,7 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 
 	for _, item := range rssFeed.Items {
 		image := feedImage
+		alt := feedAlt
 		if len(item.Enclosures) > 0 {
 			media := item.Enclosures[0]
 			if !slices.Contains(mediaType, media.Type) {
@@ -79,6 +81,7 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 		}
 		if item.Image != nil {
 			image = item.Image.URL
+			alt = item.Image.Title
 		}
 		var feedItem models.FeedItem
 		err := db.Get(&feedItem, "SELECT * FROM feed_items WHERE guid = ?;", item.GUID)
@@ -90,15 +93,15 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 				}
 			}
 			if _, err = db.Exec(
-				"INSERT OR IGNORE INTO feed_items (feed_id, title, link, description, image, guid, pub_date) VALUES (?, ?, ?, ?, ?, ?, ?);",
-				feed.FeedID, item.Title, item.Link, item.Description, image, item.GUID, item.Published,
+				"INSERT OR IGNORE INTO feed_items (feed_id, title, link, description, image, alt_text, guid, pub_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+				feed.FeedID, item.Title, item.Link, item.Description, image, alt, item.GUID, item.Published,
 			); err != nil {
 				return err
 			}
 		} else {
 			if feedItem.Image == "" {
 				if image != "" {
-					if _, err := db.Exec("UPDATE feed_items SET image = ? WHERE id = ?", image, feedItem.ID); err != nil {
+					if _, err := db.Exec("UPDATE feed_items SET image = ?, alt_text WHERE id = ?", image, feedItem.ID); err != nil {
 						return err
 					}
 				}
@@ -107,7 +110,7 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 	}
 	if len(mediaType) >= 1 {
 		log.Debug("Media types: ", mediaType)
-		if _, err := db.Exec("UPDATE feeds SET media_type = ? WHERE id = ?;", mediaType[0], feed.ID); err != nil {
+		if _, err := db.Exec("UPDATE feeds SET media_type = ? WHERE feed_id = ?;", mediaType[0], feed.FeedID); err != nil {
 			return err
 		}
 	}
