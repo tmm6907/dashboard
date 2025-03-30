@@ -1,8 +1,6 @@
 package worker
 
 import (
-	"fmt"
-	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -10,46 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/mmcdole/gofeed"
 	"github.com/tmm6907/dashboard/models"
-	"golang.org/x/net/html"
+	"github.com/tmm6907/dashboard/utils"
 )
-
-func getOGImage(url string) (string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// Parse the HTML
-	tokenizer := html.NewTokenizer(resp.Body)
-
-	for {
-		tt := tokenizer.Next()
-
-		switch tt {
-		case html.ErrorToken:
-			// End of document
-			return "", fmt.Errorf("og:image not found")
-		case html.StartTagToken, html.SelfClosingTagToken:
-			token := tokenizer.Token()
-			if token.Data == "meta" {
-				// Check attributes for property="og:image"
-				var content string
-				for _, attr := range token.Attr {
-					if attr.Key == "property" && attr.Val == "og:image" {
-						// Once we find property="og:image", get the content attribute
-						for _, attr := range token.Attr {
-							if attr.Key == "content" {
-								content = attr.Val
-								return content, nil
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
 
 func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 	rssParser := gofeed.NewParser()
@@ -105,7 +65,7 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 		var feedItem models.FeedItem
 		err := db.Get(&feedItem, "SELECT * FROM feed_items WHERE guid = ?;", item.GUID)
 		if image == "" {
-			image, _ = getOGImage(item.Link)
+			image, _ = utils.GetOGImage(item.Link)
 			if image == "" && feedImage != "" {
 				image = feedImage
 			}
@@ -117,9 +77,13 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 			media = mediaType
 		}
 		if err != nil {
+			pubDate, err := utils.ParseTimeStr(item.Published)
+			if err != nil {
+				return err
+			}
 			if _, err = db.Exec(
 				"INSERT OR IGNORE INTO feed_items (feed_id, title, link, description, image, alt_text, categories, guid, pub_date, media_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-				feed.FeedID, item.Title, item.Link, item.Description, image, alt, categories, item.GUID, item.Published, media,
+				feed.FeedID, item.Title, item.Link, item.Description, image, alt, categories, item.GUID, utils.Timestamp(pubDate), media,
 			); err != nil {
 				return err
 			}

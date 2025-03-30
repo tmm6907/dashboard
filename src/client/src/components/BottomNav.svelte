@@ -29,40 +29,39 @@
 </script>
 
 <div
-    class="fixed bg-base-100 text-base-content grid grid-flow-col gap-2 w-full"
-    style="padding: 1em 0; gap: 0.5em; bottom: 0; left:0;"
+    class="fixed bottom-0 left-0 bg-base-200 text-base-content grid grid-cols-5 gap-4 w-full"
 >
-    <button class="btn btn-ghost text-ren">
+    <button class="btn btn-ghost py-8 text-ren">
         <div style="display: block;">
             <div><i class="fa-solid fa-bookmark"></i></div>
-            <span class="dock-label">Saved</span>
+            <span class="dock-label text-xs">Saved</span>
         </div>
     </button>
 
-    <button class="btn btn-ghost">
+    <button class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-globe"></i></div>
-            <span class="dock-label">Discover</span>
+            <span class="dock-label text-xs">Discover</span>
         </div>
     </button>
 
-    <button id="showBoxBtn" class="btn btn-ghost">
+    <button id="showBoxBtn" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-plus"></i></div>
-            <span class="dock-label">Add</span>
+            <span class="dock-label text-xs">Add</span>
         </div>
     </button>
 
-    <button class="btn btn-ghost">
+    <a href="/" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-house"></i></div>
-            <span class="dock-label">Home</span>
+            <span class="dock-label text-xs">Home</span>
         </div>
-    </button>
-    <button class="btn btn-ghost" on:click={logout}>
+    </a>
+    <button class="btn btn-ghost py-8" on:click={logout}>
         <div style="display: block;">
             <div><i class="fa-solid fa-user"></i></div>
-            <span class="dock-label">Profile</span>
+            <span class="dock-label text-xs">Profile</span>
         </div>
     </button>
 </div>

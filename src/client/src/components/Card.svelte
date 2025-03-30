@@ -1,24 +1,17 @@
 <script>
+    import { getTimeAgo } from "$lib";
     let { podcast, item } = $props();
-
-    const getTimeAgo = (time) => {
-        let date = new Date(time.replace(" ", "T") + "Z");
-
-        const now = new Date();
-        const diff = Math.floor((now - date) / 1000); // Difference in seconds
-
-        const days = Math.floor(diff / (60 * 60 * 24));
-        const hours = Math.floor(diff / (60 * 60));
-        const minutes = Math.floor(diff / 60);
-
-        if (days > 0) return `${days}d ago`;
-        if (hours > 0) return `${hours}h ago`;
-        console.log(time);
-        return `${minutes}m ago`;
+    const goToFeedItem = () => {
+        sessionStorage.setItem("selectedItem", `${item.id}`);
+        window.location.href = "/items/" + item.id;
     };
 </script>
 
-<div class="text-base-content pb-4 min-w-[32ch] max-w-[60ch]">
+<div
+    role="button"
+    class="text-base-content pb-4 min-w-[32ch] max-w-[48ch]"
+    on:click={goToFeedItem}
+>
     <img
         src={item.image
             ? item.image
@@ -28,8 +21,20 @@
         class="h-48 w-full object-fill"
     />
     <span class=" text-wrap line-clamp-2">{item.title}</span>
-    <div class="prose">
-        <span class="text-secondary">{podcast}</span> |
-        <span>{getTimeAgo(item.pubDate)}</span>
+    <div class="flex justify-between py-2">
+        <div class="prose">
+            <div class="max-w-[24ch] text-secondary truncate">
+                {podcast}
+            </div>
+            <span>{getTimeAgo(item.pubDate)}</span>
+        </div>
+        <div class=" card-icons flex space-x-2">
+            <button class="btn btn-sm btn-ghost"
+                ><i class="fa-regular fa-plus"></i></button
+            >
+            <button class="btn btn-sm btn-ghost"
+                ><i class="fa-regular fa-bookmark"></i></button
+            >
+        </div>
     </div>
 </div>

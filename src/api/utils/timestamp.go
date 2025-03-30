@@ -20,9 +20,10 @@ var externalFormats = []string{
 	"Mon, 02 Jan 2006 15:04:05 -0700",
 	"Mon, 02 Jan 2006 15:04:05 MST",
 	"2006-01-02T15:04:05-0700",
+	time.RFC3339,
 }
 
-func parseTimeStr(timeStr string) (time.Time, error) {
+func ParseTimeStr(timeStr string) (time.Time, error) {
 	timeStr = strings.Replace(timeStr, "+00:00", "+0000", 1)
 	for _, format := range externalFormats {
 		parsedTime, err := time.Parse(format, timeStr)
@@ -71,13 +72,13 @@ func (t *Timestamp) Scan(value any) error {
 	}
 	switch v := value.(type) {
 	case string:
-		parsedTime, err := parseTimeStr(v)
+		parsedTime, err := ParseTimeStr(v)
 		if err != nil {
 			return fmt.Errorf("failed to parse timestamp: %v", err)
 		}
 		*t = Timestamp(parsedTime)
 	case []byte:
-		parsedTime, err := parseTimeStr(string(v))
+		parsedTime, err := ParseTimeStr(string(v))
 		if err != nil {
 			return fmt.Errorf("failed to parse timestamp: %v", err)
 		}

@@ -34,7 +34,7 @@
 </script>
 
 <div
-    class="flex overflow-x-scroll items-center space-x-2"
+    class="flex overflow-x-auto items-center space-x-2"
     style="padding: 1em 0.5em;"
 >
     <select
