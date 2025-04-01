@@ -20,6 +20,7 @@ var externalFormats = []string{
 	"Mon, 02 Jan 2006 15:04:05 -0700",
 	"Mon, 02 Jan 2006 15:04:05 MST",
 	"2006-01-02T15:04:05-0700",
+	"Mon, 2 Jan 2006 15:04:05 MST",
 	time.RFC3339,
 }
 
@@ -33,15 +34,6 @@ func ParseTimeStr(timeStr string) (time.Time, error) {
 	}
 	return time.Time{}, fmt.Errorf("invalid RSS time format: %s", timeStr)
 }
-
-// func (t *Timestamp) UnmarshalText(text []byte) error {
-// 	parsedTime, err := time.Parse(timeFormat, string(text))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	*t = Timestamp(parsedTime)
-// 	return nil
-// }
 
 // MarshalJSON controls how Timestamp is serialized to JSON
 func (t Timestamp) MarshalJSON() ([]byte, error) {

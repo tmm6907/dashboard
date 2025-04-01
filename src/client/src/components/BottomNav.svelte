@@ -1,4 +1,5 @@
 <script>
+    import { profileData } from "$lib/state.svelte";
     import { onMount } from "svelte";
 
     const logout = () => {
@@ -8,6 +9,12 @@
         })
             .then(() => console.log("Logged out"))
             .catch(console.error);
+    };
+    const toggleMenu = () => {
+        const menu = document.getElementById("profile-menu");
+        if (menu.classList.contains("hidden")) {
+        }
+        menu.classList.toggle("hidden");
     };
     onMount(() => {
         document.getElementById("showBoxBtn")?.addEventListener("click", () => {
@@ -31,12 +38,12 @@
 <div
     class="fixed bottom-0 left-0 bg-base-200 text-base-content grid grid-cols-5 gap-4 w-full"
 >
-    <button class="btn btn-ghost py-8 text-ren">
+    <a href="/saved" class="btn btn-ghost py-8 text-ren">
         <div style="display: block;">
             <div><i class="fa-solid fa-bookmark"></i></div>
             <span class="dock-label text-xs">Saved</span>
         </div>
-    </button>
+    </a>
 
     <button class="btn btn-ghost py-8">
         <div style="display: block;">
@@ -58,10 +65,25 @@
             <span class="dock-label text-xs">Home</span>
         </div>
     </a>
-    <button class="btn btn-ghost py-8" on:click={logout}>
+    <button class="relative btn btn-ghost py-8" on:click={toggleMenu}>
         <div style="display: block;">
             <div><i class="fa-solid fa-user"></i></div>
             <span class="dock-label text-xs">Profile</span>
+        </div>
+        <div
+            id="profile-menu"
+            class="absolute bg-base-200 -top-60 -left-30 hidden rounded-lg py-4"
+        >
+            <div>
+                <label for="mashboard-email">{profileData.mashboardEmail}</label
+                >
+            </div>
+            <ul class=" menu rounded-box w-[24ch]">
+                <li><a>View Profile</a></li>
+                <li><a>Collections</a></li>
+                <li><a>Settings</a></li>
+                <li><a>Logout</a></li>
+            </ul>
         </div>
     </button>
 </div>

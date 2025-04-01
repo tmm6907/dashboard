@@ -1,22 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { feedState } from "$lib/state.svelte";
-    import { fetchFeedItems, sortFeedItems } from "$lib";
-
     let filter = $state("All Categories");
-
-    $effect(async () => {
-        let results = await fetchFeedItems(filter);
-        console.log("category changed", filter);
-        feedState.feedItems = sortFeedItems(results.items ? results.items : []);
-        feedState.feedCollections = sortFeedItems(
-            results.collections ? results.collections : [],
-        );
-        feedState.feedLatest = sortFeedItems(
-            results.latest ? results.latest : [],
-        );
-        feedState.feedSaved = sortFeedItems(results.saved ? results.saved : []);
-    });
 
     onMount(() => {
         document.addEventListener("click", (e) => {

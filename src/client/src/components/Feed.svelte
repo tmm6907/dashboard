@@ -7,5 +7,11 @@
     {#if feedState.feedItems.length > 25}
         <Section heading="Latest" items={feedState.feedLatest} />
     {/if}
+
+    <Section
+        heading="Collections"
+        items={feedState.feedCollections}
+        feed={false}
+    />
     <Section heading="All" items={feedState.feedItems} vertical />
 </div>

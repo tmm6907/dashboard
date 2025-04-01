@@ -19,9 +19,15 @@
 
     async function fetchFeedData() {
         try {
-            let response = await fetch(
-                `http://localhost:8080/api/feeds/find?url=${feedData.url}`,
-            );
+            console.log(feedData.url);
+            let response = await fetch("http://localhost:8080/api/feeds/find", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ url: feedData.url }),
+            });
             if (response.status == 302) {
                 console.log("redirect");
                 window.location.href = await response.text();

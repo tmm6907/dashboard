@@ -1,4 +1,3 @@
-import { fetchFeedItems, sortFeedItems } from "$lib";
 
 export const feedState = $state({
     feedItems: [],
@@ -13,5 +12,11 @@ export const selectedItem = $state({
     data: {}
 })
 
+
+export const profileData = $state({
+    name: "",
+    mashboardEmail: "",
+    oauthProvider: "",
+})
 
 

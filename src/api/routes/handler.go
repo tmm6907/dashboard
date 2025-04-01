@@ -264,3 +264,33 @@ func (h *Handler) ValidateURL(url string) bool {
 	}
 	return false
 }
+
+func (h *Handler) QueryRows(items *[]map[string]any, query string, args ...any) error {
+	db := h.GetDB()
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	cols, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		values := make([]any, len(cols))
+		valuePtrs := make([]any, len(cols))
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+		if err := rows.Scan(valuePtrs...); err != nil {
+			log.Error(err)
+			return err
+		}
+		item := make(map[string]any)
+		for i, colName := range cols {
+			item[colName] = values[i]
+		}
+		*items = append(*items, item)
+	}
+	return nil
+}

@@ -61,6 +61,16 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 		}
 		if len(item.Categories) > 0 {
 			categories = strings.Join(item.Categories, ", ")
+			if item.ITunesExt != nil && item.ITunesExt.Keywords != "" {
+				log.Debug(item.ITunesExt.Keywords)
+				// categories = item.ITunesExt.Keywords
+			}
+		} else {
+			if item.ITunesExt != nil && item.ITunesExt.Keywords != "" {
+				log.Debug(item.ITunesExt.Keywords)
+			}
+
+			// categories = item.ITunesExt.Keywords
 		}
 		var feedItem models.FeedItem
 		err := db.Get(&feedItem, "SELECT * FROM feed_items WHERE guid = ?;", item.GUID)

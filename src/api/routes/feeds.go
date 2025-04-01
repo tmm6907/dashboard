@@ -1,18 +1,13 @@
 package routes
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
-	"sort"
-	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
 	"github.com/mmcdole/gofeed"
-	"github.com/tmm6907/dashboard/auth"
 	"github.com/tmm6907/dashboard/models"
 	"github.com/tmm6907/dashboard/utils"
 )
@@ -32,110 +27,6 @@ func (h *Handler) GetFeeds(c *fiber.Ctx) error {
 	}
 	return c.JSON(map[string]any{
 		"feeds": feeds,
-	})
-}
-
-func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
-	feedItemID := c.Params("id")
-	feedItem := make(map[string]interface{})
-
-	db := h.GetDB()
-	row := db.QueryRowx(`
-		SELECT fi.*, f.title as feedName 
-		FROM feed_items fi
-		JOIN feeds f ON fi.feed_id = f.feed_id
-		WHERE fi.id = ?;`, feedItemID)
-
-	if err := row.MapScan(feedItem); err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-	log.Debug(feedItem["pub_date"])
-	return c.JSON(feedItem)
-}
-
-func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
-	var feedItems []models.FeedItem
-	db := h.GetDB()
-	token := c.Cookies("token")
-	if token == "" {
-		log.Error("token should not be empty")
-		return c.SendStatus(http.StatusInternalServerError)
-	}
-	user, err := h.GetUserFromToken(token)
-	if err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-	userID := user.ID
-
-	category := strings.ToLower(c.Query("category"))
-	if category != "" && category != "all" && category != "all categories" {
-		if category == "technology" {
-			category = "tech"
-		}
-		log.Debug(category)
-		if err := db.Select(&feedItems, "SELECT * FROM feed_items WHERE categories LIKE ? OR media_type LIKE ?;", "%"+category+"%", "%"+category+"%"); err != nil {
-			log.Error(err)
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-	} else {
-		if err := db.Select(&feedItems, "SELECT * FROM feed_items;"); err != nil {
-			log.Error(err)
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-	}
-
-	sort.Slice(feedItems, func(i, j int) bool {
-		return time.Time(feedItems[i].PubDate).After(time.Time(feedItems[j].PubDate))
-	})
-
-	latest := []map[string]any{}
-	var saved []models.FeedItem
-	var collections []string
-
-	if err = db.Select(&saved, `
-			SELECT fi.* 
-			FROM feed_items fi
-			JOIN saved_feeds sf ON fi.id = sf.feed_item_id
-			WHERE sf.user_id = ?;`, userID); err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	if err = db.Select(&collections, `
-			SELECT c.name 
-			FROM collections c
-			JOIN user_collections uc ON c.id = uc.collection_id
-			WHERE uc.user_id = ?;`, userID); err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-	items := []map[string]any{}
-	for _, item := range feedItems {
-		var name string
-		err = db.Get(&name, "SELECT title from feeds where feed_id = ?", item.FeedID)
-		if err != nil {
-			log.Error(err)
-		}
-		resultItem := make(map[string]any)
-		resultItem["name"] = name
-		resultItem["item"] = item
-		pubDate := time.Time(item.PubDate)
-		if time.Now().Sub(pubDate) <= 3*24*time.Hour {
-			latest = append(latest, resultItem)
-		}
-		items = append(items, resultItem)
-	}
-
-	log.Debug(len(latest), len(saved), len(collections), len(feedItems))
-	if len(latest) > 0 {
-		log.Debug(latest[0]["name"])
-	}
-	return c.JSON(map[string]any{
-		"latest":      latest,
-		"items":       items,
-		"saved":       saved,
-		"collections": collections,
 	})
 }
 
@@ -197,15 +88,22 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 }
 
 func (h *Handler) SearchForFeed(c *fiber.Ctx) error {
-	feedURL := c.Query("url")
+	body := struct {
+		URL string `json:"url"`
+	}{}
+	if err := c.BodyParser(&body); err != nil {
+		return c.SendStatus(500)
+	}
+
 	rssParser := gofeed.NewParser()
-	feedData, err := rssParser.ParseURL(feedURL)
+
+	feedData, err := rssParser.ParseURL(body.URL)
 	if err != nil {
 		log.Error(err)
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	if feedData.Image == nil {
-		ogImage, err := utils.GetOGImage(feedURL)
+		ogImage, err := utils.GetOGImage(body.URL)
 		if err == nil {
 			feedData.Image = &gofeed.Image{URL: ogImage}
 		} else {
@@ -288,66 +186,4 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 		}
 	}
 	return c.SendStatus(http.StatusOK)
-}
-
-func (h *Handler) LoginHandler(c *fiber.Ctx) error {
-	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
-	log.Debug("Redirecting to ", url)
-	return c.Status(fiber.StatusFound).SendString(url)
-}
-
-func (h *Handler) CallbackHandler() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		log.Debug("callback reached")
-		code := c.Query("code")
-		if code == "" {
-			log.Error("Google did not return code to callback func")
-			return c.Status(http.StatusInternalServerError).SendString("Google auth error")
-		}
-		userInfo, err := h.FetchGoogleInfo(code)
-		if err != nil {
-			log.Error("Failed to log into Google OAuth: ", err)
-			return c.Status(http.StatusInternalServerError).SendString("Invalid user ID")
-		}
-
-		// Check if user exists, if not, create them
-		var userID utils.UUID
-		db := h.GetDB()
-		newUUID := uuid.New()
-		mashboardEmail := newUUID.String() + "@mash.board"
-		err = db.QueryRow("SELECT id FROM users WHERE oauth_id = ? AND oauth_provider = 'google'", userInfo["oauthID"]).
-			Scan(&userID)
-
-		if err == sql.ErrNoRows {
-			// Insert new user
-			_, err := db.Exec("INSERT INTO users (id, oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?, ?)",
-				newUUID[:], "google", userInfo["oauthID"], userInfo["firstName"], userInfo["lastName"], mashboardEmail)
-			if err != nil {
-				log.Error("Failed to insert user:", err)
-				return c.Status(http.StatusInternalServerError).SendString("User creation failed")
-			}
-			log.Debug("User created")
-		} else if err != nil {
-			log.Error("Database query failed:", err)
-			return c.Status(http.StatusInternalServerError).SendString("Database error")
-		}
-
-		if err = h.SaveNewToken(c, userInfo["oauthID"], userInfo["firstName"], userInfo["lastName"], code); err != nil {
-			log.Error(err)
-			return c.Status(http.StatusInternalServerError).SendString("Unable to generate auth token")
-		}
-		return c.Redirect("http://localhost:3030")
-	}
-}
-
-func (h *Handler) Logout(c *fiber.Ctx) error {
-	c.Cookie(&fiber.Cookie{
-		Name:     "token",
-		Value:    "",
-		Expires:  time.Now().Add(-time.Hour), // Set expiration in the past
-		HTTPOnly: true,
-		Secure:   false, // Set to true if using HTTPS
-		SameSite: "Lax",
-	})
-	return c.Status(fiber.StatusOK).SendString("Logged out")
 }

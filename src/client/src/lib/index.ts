@@ -36,8 +36,9 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
 
 export const sortFeedItems = (items: any[]) => {
     // sort items on item.pubDate
+
     return items.sort(
-        (a, b) => new Date(b.item.pubDate) - new Date(a.item.pubDate),
+        (a, b) => new Date(b.pub_date) - new Date(a.pub_date)
     );
 };
 
