@@ -10,6 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/mmcdole/gofeed v1.3.0
+	golang.org/x/net v0.17.0
 	golang.org/x/oauth2 v0.28.0
 )
 
@@ -30,7 +31,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 )

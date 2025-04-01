@@ -9,8 +9,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/gofiber/fiber/v2/log"
 )
 
 func ExtractChannelID(youtubeURL string) (string, error) {
@@ -64,7 +62,6 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 	switch {
 	case handleRegex.MatchString(channelURL):
 		//https://www.googleapis.com/youtube/v3/channels?part=id&forUsername=@LegalEagle&key=
-		log.Debug(handleRegex.FindStringSubmatch(channelURL))
 		identifier := handleRegex.FindStringSubmatch(channelURL)[1]
 		url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=@%s&key=%s", identifier, apiKey)
 		res, err := http.Get(url)

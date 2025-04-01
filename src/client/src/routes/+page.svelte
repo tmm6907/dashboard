@@ -1,36 +1,28 @@
 <script>
+    import { fetchFeedItems, sortFeedItems } from "$lib";
+    import { feedState } from "$lib/state.svelte";
     import { onMount } from "svelte";
-    import BottomNav from "../components/BottomNav.svelte";
-    import Feeds from "../components/FeedItems.svelte";
-
+    import Feed from "../components/Feed.svelte";
     import Filter from "../components/Filter.svelte";
-    import SubscribeForm from "../components/SubscribeForm.svelte";
-    import FeedItems from "../components/FeedItems.svelte";
+    async function updateFeed() {
+        let results = await fetchFeedItems(feedState.category);
+        console.log("category changed", feedState.category);
+        console.log(results);
+        feedState.feedItems = sortFeedItems(results.items ? results.items : []);
+        console.log("coll", results.collections);
+        feedState.feedCollections = results.collections;
 
-    onMount(() => {
-        const login = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/auth/", {
-                    method: "GET",
-                    credentials: "include", // Important for cookies/sessions
-                });
-
-                if (response.status === 302) {
-                    const redirectUrl = await response.text();
-                    if (redirectUrl) {
-                        window.location.href = redirectUrl; // Redirect manually
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        login();
+        feedState.feedLatest = sortFeedItems(
+            results.latest ? results.latest : [],
+        );
+    }
+    $effect(async () => {
+        await updateFeed();
+    });
+    onMount(async () => {
+        await updateFeed();
     });
 </script>
 
 <Filter />
-<FeedItems />
-<SubscribeForm />
-<BottomNav />
+<Feed />

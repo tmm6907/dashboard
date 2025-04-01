@@ -1,6 +1,8 @@
 <script>
-    let { children } = $props();
+    import BottomNav from "../components/BottomNav.svelte";
+    import SubscribeForm from "../components/SubscribeForm.svelte";
     import "../global.css";
+    let { children } = $props();
 </script>
 
 <svelte:head>
@@ -22,3 +24,6 @@
 </svelte:head>
 
 {@render children()}
+
+<SubscribeForm />
+<BottomNav />

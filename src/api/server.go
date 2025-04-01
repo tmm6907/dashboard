@@ -78,7 +78,10 @@ func main() {
 	defer db.Close()
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3030, http://localhost:8080, http://localhost", // Allow all origins
+		AllowOrigins: `
+		http://localhost:3030, http://localhost:8080, http://localhost/,
+		http://localhost:4173
+		`, // Allow all origins
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
@@ -104,11 +107,18 @@ func main() {
 	workerHandler := worker.NewHandler(db)
 
 	apiRoutes := server.Group("/api")
-	apiRoutes.Get("/feeds", routesHandler.GetFeeds)
-	apiRoutes.Post("/feeds", routesHandler.CreateFeed)
-	apiRoutes.Get("/feeds/items", routesHandler.GetFeedItems)
+	feedRoutes := apiRoutes.Group("/feeds")
+	feedItemRoutes := feedRoutes.Group("/items")
+	feedRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
+	feedRoutes.Post("/", routesHandler.CreateFeed)
+	feedRoutes.Post("/find", routesHandler.CheckAuthHandler(), routesHandler.SearchForFeed)
+	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
+	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
+	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
+	feedItemRoutes.Get("/:id", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItem)
+	feedItemRoutes.Post("/:id/bookmark", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
+
 	authRoutes := server.Group("/auth")
-	authRoutes.Get("/", routesHandler.CheckAuth)
 	authRoutes.Get("/login", routesHandler.LoginHandler)
 	authRoutes.Get("/logout", routesHandler.Logout)
 	authRoutes.Get("/callback", routesHandler.CallbackHandler())
@@ -130,7 +140,6 @@ func main() {
 	}
 	host := fmt.Sprintf(":%s", port)
 	log.Debug(host)
-	// interval := 15 * time.Minute
 	go workerHandler.StartRSSFetcher(nil)
 	server.Listen(host)
 }
