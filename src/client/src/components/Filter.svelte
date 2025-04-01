@@ -10,10 +10,10 @@
             console.log("clicked");
             let container = btn.parentElement;
             console.log(container);
-            let oldBtn = container.querySelector(".bg-primary");
-            oldBtn.classList.remove("bg-primary");
+            let oldBtn = container.querySelector(".btn-primary");
+            oldBtn.classList.remove("btn-primary");
             feedState.category = btn.textContent;
-            btn.classList.add("bg-primary");
+            btn.classList.add("btn-primary");
         });
     });
 </script>
@@ -35,7 +35,7 @@
         <option value="politics">Politics</option>
         <option value="lifestyle">Lifestyle</option>
     </select>
-    <button class="filter-btn btn btn-sm bg-primary">All</button>
+    <button class="filter-btn btn btn-sm btn-primary">All</button>
     <button class="filter-btn btn btn-sm">News</button>
     <button class="filter-btn btn btn-sm">Podcasts</button>
     <button class="filter-btn btn btn-sm">Video</button>

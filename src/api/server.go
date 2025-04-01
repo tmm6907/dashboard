@@ -78,7 +78,10 @@ func main() {
 	defer db.Close()
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3030, http://localhost:8080, http://localhost", // Allow all origins
+		AllowOrigins: `
+		http://localhost:3030, http://localhost:8080, http://localhost/,
+		http://localhost:4173
+		`, // Allow all origins
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
@@ -137,7 +140,6 @@ func main() {
 	}
 	host := fmt.Sprintf(":%s", port)
 	log.Debug(host)
-	// interval := 15 * time.Minute
 	go workerHandler.StartRSSFetcher(nil)
 	server.Listen(host)
 }

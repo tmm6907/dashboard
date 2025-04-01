@@ -68,24 +68,20 @@
                 class="py-4 grid grid-cols-1"
                 style="gap: 1em 0;"
             >
-                <div
+                <button
                     id="create-new-feeed"
-                    role="button"
-                    class="feed-row btn bg-primary"
-                    style="gap:0.5em;"
+                    class="feed-row btn btn-primary flex items-center"
                     onclick={gotoNewFeedForm}
                 >
-                    <div class="flex items-center">
+                    <div class="">
                         <i class="fa fa-plus"></i>
                     </div>
                     <span>Create New Feed</span>
-                </div>
-                <div class="h-48 overflow-y-auto">
+                </button>
+                <div class="h-64 overflow-y-auto">
                     {#each feeds as feed}
                         <div
                             id={feed.feedId}
-                            role="button"
-                            onclick={() => console.log("Clicked:", feed)}
                             class="feed-row grid grid-cols-4 items-center border-base-300 cursor-pointer"
                             style="gap:0.5em;"
                         >
@@ -103,7 +99,7 @@
                                 <span>{feed.title}</span>
                             </div>
                             <div class="flex justify-end pr-2">
-                                <button class="btn btn-sm btn-neutral-content"
+                                <button class="btn btn-sm btn-soft"
                                     >Follow</button
                                 >
                             </div>

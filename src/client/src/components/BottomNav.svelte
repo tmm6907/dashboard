@@ -16,23 +16,40 @@
         }
         menu.classList.toggle("hidden");
     };
-    onMount(() => {
-        document.getElementById("showBoxBtn")?.addEventListener("click", () => {
-            let subForm = document.getElementById("subscribe-form");
 
-            if (subForm?.classList.contains("slide-out")) {
-                // Show the subForm?
-                subForm.parentElement?.classList.remove("pointer-events-none");
-                subForm?.classList.remove("slide-out");
-                subForm?.classList.add("slide-in");
-            } else {
-                // Hide the subForm?
-                subForm?.parentElement?.classList.add("pointer-events-none");
-                subForm?.classList.remove("slide-in");
-                subForm?.classList.add("slide-out");
-            }
-        });
-    });
+    const closeSubscribeMenu = () => {
+        let subForm = document.getElementById("subscribe-form");
+        if (!subForm) return;
+
+        subForm.parentElement?.classList.add("pointer-events-none");
+        subForm.classList.remove("slide-in");
+        subForm.classList.add("slide-out");
+    };
+
+    const openSubscribeMenu = () => {
+        let subForm = document.getElementById("subscribe-form");
+        if (!subForm) return;
+        if (subForm.classList.contains("slide-out")) {
+            // Show the subForm
+            subForm.parentElement?.classList.remove("pointer-events-none");
+            subForm.classList.remove("slide-out");
+            subForm.classList.add("slide-in");
+
+            const handleOutsideClick = (e) => {
+                if (!subForm.contains(e.target)) {
+                    closeSubscribeMenu();
+                    document.removeEventListener("click", handleOutsideClick);
+                }
+            };
+            setTimeout(() => {
+                document.addEventListener("click", handleOutsideClick);
+            }, 0);
+        } else {
+            // Hide the subForm?
+            closeSubscribeMenu();
+        }
+    };
+    onMount(() => {});
 </script>
 
 <div
@@ -52,7 +69,11 @@
         </div>
     </button>
 
-    <button id="showBoxBtn" class="btn btn-ghost py-8">
+    <button
+        id="showBoxBtn"
+        class="btn btn-ghost py-8"
+        onclick={openSubscribeMenu}
+    >
         <div style="display: block;">
             <div><i class="fa-solid fa-plus"></i></div>
             <span class="dock-label text-xs">Add</span>
@@ -65,7 +86,7 @@
             <span class="dock-label text-xs">Home</span>
         </div>
     </a>
-    <button class="relative btn btn-ghost py-8" on:click={toggleMenu}>
+    <button class="relative btn btn-ghost py-8" onclick={toggleMenu}>
         <div style="display: block;">
             <div><i class="fa-solid fa-user"></i></div>
             <span class="dock-label text-xs">Profile</span>

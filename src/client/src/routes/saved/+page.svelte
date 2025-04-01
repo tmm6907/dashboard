@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import Section from "../../components/Section.svelte";
+    export const prerender = false;
 
     let items = $state([]);
 

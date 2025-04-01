@@ -80,7 +80,7 @@
         <div class="prose flex justify-between gap-1 overflow-y-auto">
             <div class="flex gap-2">
                 <div class="max-w-[24ch] text-secondary truncate">
-                    {item.feedName}
+                    {item.feed_name}
                 </div>
                 |
                 <span>{getTimeAgo(item.pub_date ? item.pub_date : "")}</span>
@@ -105,7 +105,7 @@
             alt={item.altText ? item.altText : "feed item"}
             class="aspect-[3/2]"
         />
-        <p class="prose text-neutral-content text-wrap overflow-y-auto">
+        <p class="prose text-base-content text-wrap overflow-y-auto">
             {item.description}
         </p>
 
@@ -117,10 +117,10 @@
     </div>
     <div>
         <div class="grid grid-cols-2 gap-4 mt-auto">
-            <button class="btn bg-success text-neutral"
+            <button class="btn btn-accent text-neutral"
                 ><i class="fa fa-share"></i> Share</button
             >
-            <a href="/" class="btn bg-primary">Return to feed</a>
+            <a href="/" class="btn btn-primary">Return to feed</a>
         </div>
     </div>
 </div>

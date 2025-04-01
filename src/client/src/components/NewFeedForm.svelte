@@ -212,7 +212,7 @@
                     disabled={!validFeed}>Preview</button
                 >
             </div>
-            <button class="btn bg-primary" type="button" onclick={followFeed}
+            <button class="btn btn-primary" type="button" onclick={followFeed}
                 >Create</button
             >
         </div>
