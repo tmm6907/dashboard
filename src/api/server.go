@@ -76,7 +76,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	allowedOrigins := "http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173"
+	allowedOrigins := "http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173, http://50.116.53.73:3030"
 
 	server.Use(cors.New(cors.Config{
 		AllowOrigins:     allowedOrigins,
