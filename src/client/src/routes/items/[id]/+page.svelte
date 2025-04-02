@@ -18,9 +18,12 @@
                 console.error("id null");
                 return;
             }
-            let response = await fetch("/api/feeds/items/" + id, {
-                credentials: "include",
-            });
+            let response = await fetch(
+                "http://50.116.53.73:8080/api/feeds/items/" + id,
+                {
+                    credentials: "include",
+                },
+            );
             if (response.status == 302) {
                 console.log("redirect");
                 window.location.href = await response.text();
@@ -44,10 +47,13 @@
             return;
         }
         try {
-            let response = await fetch(`/api/feeds/items/${item.id}/bookmark`, {
-                method: "POST",
-                credentials: "include",
-            });
+            let response = await fetch(
+                `http://50.116.53.73:8080/api/feeds/items/${item.id}/bookmark`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                },
+            );
             if (response.status == 302) {
                 window.location.href = await response.text();
                 return;

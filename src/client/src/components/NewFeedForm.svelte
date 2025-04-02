@@ -20,14 +20,17 @@
     async function fetchFeedData() {
         try {
             console.log(feedData.url);
-            let response = await fetch("/api/feeds/find", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+            let response = await fetch(
+                "http://50.116.53.73:8080/api/feeds/find",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({ url: feedData.url }),
                 },
-                credentials: "include",
-                body: JSON.stringify({ url: feedData.url }),
-            });
+            );
             if (response.status == 302) {
                 console.log("redirect");
                 window.location.href = await response.text();
@@ -62,7 +65,7 @@
         }
         let body = JSON.stringify(Object.fromEntries(formData));
         console.log("body", body);
-        fetch("/api/feeds/follow", {
+        fetch("http://50.116.53.73:8080/api/feeds/follow", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

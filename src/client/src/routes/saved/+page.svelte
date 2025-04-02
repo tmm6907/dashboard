@@ -6,9 +6,12 @@
 
     const getSavedItems = async () => {
         try {
-            let response = await fetch(`/api/feeds/items/saved/`, {
-                credentials: "include",
-            });
+            let response = await fetch(
+                `http://50.116.53.73:8080/api/feeds/items/saved/`,
+                {
+                    credentials: "include",
+                },
+            );
             if (response.status == 302) {
                 window.location.href = await response.text();
                 return;
