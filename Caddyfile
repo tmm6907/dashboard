@@ -3,15 +3,23 @@
 }
 
 # Serve Astro frontend
-http://localhost {
-	root * /dist
-	file_server
+mashboard.app {
+	@cors_options method OPTIONS
+	handle @cors_options {
+		respond "" 204
+	}
 
+	# Proxy API requests to backend
 	handle /api/* {
 		reverse_proxy server:8080
 		header Access-Control-Allow-Origin *
 		header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 		header Access-Control-Allow-Headers "Content-Type, Authorization"
+	}
+
+	# Proxy all other requests to SSR frontend running on port 3030
+	handle /* {
+		reverse_proxy server:3030
 	}
 }
 

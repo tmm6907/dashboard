@@ -23,10 +23,10 @@ This is a test email.
 QUIT
 
 TODO:
-- block creation of duplicate feeds (by link)
+- configure caddy file in linode, rewrite compose to run server for frontend, 
 
 TODO for Prod:
-- get domain
+- get domain [done]
 - switch all urls to use domain (caddy, compose, .go, etc.)
 - setup spf record and dmarc record in dns txt record on Linode
 - enable spf and dkim checks in mail server (set allow insecure to false)
