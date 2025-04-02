@@ -37,8 +37,8 @@ export default defineConfig({
 		port: 3030,
 		proxy: {
 			'/api': {
-				target: 'http://50.116.53.73:8080/api',
-				changeOrigin: true,
+				target: 'http://localhost:8080/api',
+				changeOrigin: false,
 				secure: false,
 			}
 		},
