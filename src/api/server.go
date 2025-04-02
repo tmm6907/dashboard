@@ -76,12 +76,23 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	allowedOrigins := "http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173"
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     `http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173`,
+		AllowOrigins:     allowedOrigins,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
+	server.Use(func(c *fiber.Ctx) error {
+		if c.Method() == "OPTIONS" {
+			c.Set("Access-Control-Allow-Origin", allowedOrigins)
+			c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+			return c.SendStatus(204)
+		}
+		return c.Next()
+	})
+
 	client_id := os.Getenv("GOOGLE_CLIENT_ID")
 	if client_id == "" {
 		log.Fatal("Missing google client id")
