@@ -80,7 +80,7 @@ func main() {
 	server.Use(cors.New(cors.Config{
 		AllowOrigins: `
 		http://localhost:3030, http://localhost:8080, http://localhost/,
-		http://localhost:4173
+		http://localhost:4173, http://50.116.53.73:4173
 		`, // Allow all origins
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
