@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
 
     const logout = () => {
-        fetch("http://localhost:8080/auth/logout/", {
+        fetch("http://50.116.53.73:8080/auth/logout/", {
             method: "GET",
             credentials: "include", // Important for cookies/sessions
         })

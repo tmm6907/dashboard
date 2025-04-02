@@ -20,7 +20,7 @@
     async function fetchFeedData() {
         try {
             console.log(feedData.url);
-            let response = await fetch("http://localhost:8080/api/feeds/find", {
+            let response = await fetch("/api/feeds/find", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -62,7 +62,7 @@
         }
         let body = JSON.stringify(Object.fromEntries(formData));
         console.log("body", body);
-        fetch("http://localhost:8080/api/feeds/follow", {
+        fetch("/api/feeds/follow", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },

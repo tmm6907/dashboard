@@ -8,10 +8,9 @@
     async function fetchFeeds() {
         loading = true;
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/feeds/?query=${feedQuery}`,
-                { credentials: "include" },
-            );
+            const response = await fetch(`/api/feeds/?query=${feedQuery}`, {
+                credentials: "include",
+            });
             if (response.status == 302) {
                 console.log("redirect");
                 window.location.href = await response.text();

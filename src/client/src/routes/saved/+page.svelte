@@ -1,18 +1,14 @@
 <script>
     import { onMount } from "svelte";
     import Section from "../../components/Section.svelte";
-    export const prerender = false;
 
     let items = $state([]);
 
     const getSavedItems = async () => {
         try {
-            let response = await fetch(
-                `http://localhost:8080/api/feeds/items/saved/`,
-                {
-                    credentials: "include",
-                },
-            );
+            let response = await fetch(`/api/feeds/items/saved/`, {
+                credentials: "include",
+            });
             if (response.status == 302) {
                 window.location.href = await response.text();
                 return;
