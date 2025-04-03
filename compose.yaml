@@ -29,7 +29,7 @@ services:
     ports:
       - "3030:3030"
     networks:
-      - external
+      - client_server
 
   mail:
     build:
