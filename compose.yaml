@@ -1,6 +1,6 @@
 networks:
   internal:
-  client_server:
+  client-server:
     external: true
 
 services:
@@ -23,13 +23,13 @@ services:
     build:
       context: src/client
       dockerfile: Dockerfile
-    container_name: client_server
+    container_name: client-server
     environment:
       - PORT=3030
     ports:
       - "3030:3030"
     networks:
-      - client_server
+      - client-server
 
   mail:
     build:
@@ -63,6 +63,7 @@ services:
     restart: unless-stopped
     networks:
       - internal
+      - client-server
 
 volumes:
   caddy_data:
