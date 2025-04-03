@@ -1,6 +1,7 @@
 networks:
   internal:
-
+  client_server:
+    external: true
 
 services:
   server:
@@ -22,10 +23,13 @@ services:
     build:
       context: src/client
       dockerfile: Dockerfile
+    container_name: client_server
     environment:
       - PORT=3030
     ports:
       - "3030:3030"
+    networks:
+      - external
 
   mail:
     build:
@@ -65,3 +69,5 @@ volumes:
   caddy_config:
   api_db:
   mail_db:
+
+
