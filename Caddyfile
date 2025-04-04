@@ -20,7 +20,7 @@ mashboard.app {
 	}
 }
 
-mail.localhost.com {
+mail.mashboard.app {
 	tls internal
 
 	@smtp {
