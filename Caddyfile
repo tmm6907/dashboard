@@ -1,6 +1,3 @@
-{
-	auto_https off
-}
 
 # Serve Astro frontend
 mashboard.app {
@@ -19,7 +16,7 @@ mashboard.app {
 
 	# Proxy all other requests to SSR frontend running on port 3030
 	handle /* {
-		reverse_proxy server:3030
+		reverse_proxy client-server:3030
 	}
 }
 
