@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
 
     const logout = () => {
-        fetch("https://mashboard.app:8080/auth/logout/", {
+        fetch("https://api.mashboard.app/auth/logout/", {
             method: "GET",
             credentials: "include", // Important for cookies/sessions
         })

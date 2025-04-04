@@ -22,7 +22,7 @@
         }
         try {
             let response = await fetch(
-                `https://mashboard.app:8080/api/feeds/items/${item.id}/bookmark`,
+                `https://api.mashboard.app/api/feeds/items/${item.id}/bookmark`,
                 {
                     method: "POST",
                 },

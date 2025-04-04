@@ -11,7 +11,7 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
     console.log("Fetching feed items");
     category = category ? category : ""
     try {
-        const response = await fetch("https://mashboard.app:8080/api/feeds/items?category=" + category, {
+        const response = await fetch("https://api.mashboard.app/api/feeds/items?category=" + category, {
             credentials: "include",
         });
 

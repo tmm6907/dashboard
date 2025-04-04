@@ -9,7 +9,7 @@
         loading = true;
         try {
             const response = await fetch(
-                `https://mashboard.app:8080/api/feeds/?query=${feedQuery}`,
+                `https://api.mashboard.app/api/feeds/?query=${feedQuery}`,
                 {
                     credentials: "include",
                 },
