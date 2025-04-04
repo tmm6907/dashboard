@@ -14,13 +14,11 @@ import (
 
 func (h *Handler) LoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
-	log.Debug("Redirecting to ", url)
 	return c.Status(fiber.StatusFound).SendString(url)
 }
 
 func (h *Handler) CallbackHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		log.Debug("callback reached")
 		code := c.Query("code")
 		if code == "" {
 			log.Error("Google did not return code to callback func")
@@ -48,7 +46,6 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 				log.Error("Failed to insert user:", err)
 				return c.Status(http.StatusInternalServerError).SendString("User creation failed")
 			}
-			log.Debug("User created")
 		} else if err != nil {
 			log.Error("Database query failed:", err)
 			return c.Status(http.StatusInternalServerError).SendString("Database error")

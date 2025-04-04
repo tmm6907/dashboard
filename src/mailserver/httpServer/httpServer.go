@@ -71,7 +71,6 @@ func generateXML(feedName string, recipient string, link string) ([]byte, error)
 		}
 		rssFeed.Channel.Items[i] = item
 	}
-	log.Debug(rssFeed.Channel.Items)
 
 	xmlData, err := xml.MarshalIndent(rssFeed, "", "  ")
 	if err != nil {

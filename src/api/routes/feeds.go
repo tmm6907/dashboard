@@ -141,7 +141,6 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	if feedData.Link == "" {
-		log.Debug("empty link")
 		return c.Status(fiber.StatusBadRequest).SendString("url must not be empty")
 	}
 	db := h.GetDB()
@@ -159,7 +158,6 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 	}
 
 	if feedData.Title != "" || feedData.Desc != "" {
-		log.Debug(feed)
 		if _, err = db.Exec("INSERT OR IGNORE INTO feed_follows (user_id, feed_id, user_feed_name, user_feed_desc) VALUES (?, ?, ?, ?);", user.ID, feed.FeedID, feedData.Title, feedData.Desc); err != nil {
 			log.Error(err)
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())

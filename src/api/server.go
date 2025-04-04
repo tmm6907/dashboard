@@ -17,20 +17,6 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false // File does not exist
-		}
-	}
-	if info.IsDir() {
-		log.Debug("is a dir2ectory")
-		return false
-	}
-	return !info.IsDir() // Returns false if it's a directory
-}
-
 func initDB() (*sqlx.DB, error) {
 	dbName := "mashboard.sqlite"
 	buildFile := "build.sql"
@@ -76,16 +62,21 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	allowedOrigins := "http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173, http://50.116.53.73:3030"
+	allowedOrigins := []string{
+		"https://mashboard.app",
+		"https://50.116.53.73:4173",
+		"https://50.116.53.73:3030",
+	}
+	allowedOriginsStr := strings.Join(allowedOrigins, ", ")
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
+		AllowOrigins:     allowedOriginsStr,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
 	server.Use(func(c *fiber.Ctx) error {
 		if c.Method() == "OPTIONS" {
-			c.Set("Access-Control-Allow-Origin", allowedOrigins)
+			c.Set("Access-Control-Allow-Origin", allowedOriginsStr)
 			c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 			c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
 			return c.SendStatus(204)
@@ -147,7 +138,6 @@ func main() {
 		port = "8080"
 	}
 	host := fmt.Sprintf(":%s", port)
-	log.Debug(host)
 	go workerHandler.StartRSSFetcher(nil)
 	server.Listen(host)
 }

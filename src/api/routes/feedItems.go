@@ -32,7 +32,6 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 		if category == "technology" {
 			category = "tech"
 		}
-		log.Debug(category)
 		err = h.QueryRows(&feedItems, "SELECT fi.*, f.title as feed_name FROM feed_items fi JOIN feeds f ON fi.feed_id = f.feed_id WHERE categories LIKE ? OR media_type LIKE ?;", "%"+category+"%", "%"+category+"%")
 		if err != nil {
 			log.Error(err)
@@ -85,8 +84,6 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 			latest = append(latest, item)
 		}
 	}
-
-	log.Debug(len(latest), len(collections), len(feedItems))
 	return c.JSON(map[string]any{
 		"latest":      latest,
 		"items":       feedItems,
@@ -98,7 +95,6 @@ func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
 	token := c.Cookies("token")
 	feedItemID := c.Params("id")
 	feedItem := make(map[string]interface{})
-	log.Debug(c.OriginalURL())
 	user, err := h.GetUserFromToken(token)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -139,7 +135,6 @@ func (h *Handler) SaveFeedItem(c *fiber.Ctx) error {
 	db := h.GetDB()
 	var savedFeed models.SavedFeed
 	if err = db.Get(&savedFeed, "SELECT * FROM saved_feeds WHERE user_id = ? AND feed_item_id = ? ;", user.ID, feedItemID); err == nil {
-		log.Debug("removing")
 		if _, err := db.Exec("DELETE FROM saved_feeds where user_id = ? and feed_item_id = ? ;", user.ID, feedItemID); err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString("unexpected error")
@@ -154,7 +149,6 @@ func (h *Handler) SaveFeedItem(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetSavedFeedItems(c *fiber.Ctx) error {
-	log.Debug("called")
 	token := c.Cookies("token")
 	if token == "" {
 		return c.Status(http.StatusInternalServerError).SendString("expected auth token")
