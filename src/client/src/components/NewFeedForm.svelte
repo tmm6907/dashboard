@@ -21,7 +21,7 @@
         try {
             console.log(feedData.url);
             let response = await fetch(
-                "http://50.116.53.73:8080/api/feeds/find",
+                "https://mashboard.app:8080/api/feeds/find",
                 {
                     method: "POST",
                     headers: {
@@ -65,7 +65,7 @@
         }
         let body = JSON.stringify(Object.fromEntries(formData));
         console.log("body", body);
-        fetch("http://50.116.53.73:8080/api/feeds/follow", {
+        fetch("https://mashboard.app:8080/api/feeds/follow", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
