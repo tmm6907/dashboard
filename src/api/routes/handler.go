@@ -105,6 +105,14 @@ func (h *Handler) ParseTokenString(tokenString string) (*jwt.Token, error) {
 	})
 }
 
+func (h *Handler) ParseExpiredTokenString(tokenString string) (*jwt.Token, error) {
+	jwtSecret := os.Getenv("JWT_SECRET")
+	parser := jwt.NewParser(jwt.WithoutClaimsValidation())
+	return parser.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		return []byte(jwtSecret), nil
+	})
+}
+
 func (h *Handler) IsValidJWT(tokenString string) bool {
 	token, err := h.ParseTokenString(tokenString)
 	if err != nil || !token.Valid {
@@ -123,7 +131,7 @@ func (h *Handler) CheckAuthHandler() fiber.Handler {
 		}
 		if !h.IsValidJWT(tokenString) {
 			log.Error("invalid token, resetting")
-			tokenData, err := h.GetJWTInfo(tokenString)
+			tokenData, err := h.GetJWTInfo(tokenString, true)
 			if err != nil {
 				log.Error("Unable to get user info from token: ", err)
 				return c.Status(http.StatusInternalServerError).SendString("Unable to get user info from token")
@@ -134,7 +142,7 @@ func (h *Handler) CheckAuthHandler() fiber.Handler {
 			}
 			var user models.User
 			db := h.GetDB()
-			if err := db.Get(&user, "SELECT * FROM user WHERE oauth_id = ?;", tokenData["oauth_id"]); err != nil {
+			if err := db.Get(&user, "SELECT * FROM users WHERE oauth_id = ?;", tokenData["oauth_id"]); err != nil {
 				newUUID := uuid.New()
 				mashboardEmail := newUUID.String() + "@mash.board"
 				_, err := db.Exec("INSERT INTO users (id, oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?, ?)",
@@ -177,6 +185,7 @@ func (h *Handler) GetUserFromToken(tokenString string) (*models.User, error) {
 		log.Error(err)
 		return nil, err
 	}
+	log.Debug(token)
 	// log.Debug(token)
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -195,10 +204,21 @@ func (h *Handler) GetUserFromToken(tokenString string) (*models.User, error) {
 
 }
 
-func (h *Handler) GetJWTInfo(tokenString string) (map[string]string, error) {
-	token, err := h.ParseTokenString(tokenString)
-	if err != nil {
-		return nil, err
+func (h *Handler) GetJWTInfo(tokenString string, expired bool) (map[string]string, error) {
+	token := &jwt.Token{}
+	if expired {
+		t, err := h.ParseExpiredTokenString(tokenString)
+		if err != nil {
+			return nil, err
+		}
+		token = t
+
+	} else {
+		t, err := h.ParseTokenString(tokenString)
+		if err != nil {
+			return nil, err
+		}
+		token = t
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {

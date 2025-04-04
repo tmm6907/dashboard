@@ -67,7 +67,7 @@ func initDB() (*sqlx.DB, error) {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 	}
 
 	server := fiber.New()
@@ -76,16 +76,22 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	allowedOrigins := "http://localhost:3030, http://localhost:8080, http://localhost/, http://localhost:4173, http://50.116.53.73:4173, http://50.116.53.73:3030"
+	allowedOrigins := []string{
+		"http://localhost:3030",
+		"http://localhost:8080",
+		"http://localhost/",
+		"http://localhost:4173",
+	}
+	allowedOriginsStr := strings.Join(allowedOrigins, ", ")
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
+		AllowOrigins:     allowedOriginsStr,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
 	server.Use(func(c *fiber.Ctx) error {
 		if c.Method() == "OPTIONS" {
-			c.Set("Access-Control-Allow-Origin", allowedOrigins)
+			c.Set("Access-Control-Allow-Origin", allowedOriginsStr)
 			c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 			c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
 			return c.SendStatus(204)
@@ -106,7 +112,7 @@ func main() {
 	var GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		RedirectURL:  "https://masboard.app:8080/auth/callback",
+		RedirectURL:  "http://localhost:8080/auth/callback",
 		Scopes:       []string{"profile", "email"},
 		Endpoint:     google.Endpoint,
 	}
