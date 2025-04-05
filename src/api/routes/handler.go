@@ -3,6 +3,7 @@ package routes
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -311,4 +312,9 @@ func (h *Handler) QueryRows(items *[]map[string]any, query string, args ...any) 
 		*items = append(*items, item)
 	}
 	return nil
+}
+
+func (h *Handler) IsValidUrl(urlPath string) bool {
+	_, err := url.ParseRequestURI(urlPath)
+	return err == nil
 }
