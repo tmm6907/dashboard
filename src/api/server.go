@@ -125,7 +125,7 @@ func main() {
 	feedItemRoutes := feedRoutes.Group("/items")
 	feedRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
 	feedRoutes.Post("/", routesHandler.CreateFeed)
-	feedRoutes.Post("/find", routesHandler.CheckAuthHandler(), routesHandler.SearchForNewFeedByURL)
+	feedRoutes.Post("/search/new", routesHandler.CheckAuthHandler(), routesHandler.SearchForNewFeedByURL)
 	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
 	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
 	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
