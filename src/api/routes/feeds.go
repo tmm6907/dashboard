@@ -15,13 +15,19 @@ import (
 func (h *Handler) GetFeeds(c *fiber.Ctx) error {
 	var feeds []models.Feed
 	db := h.GetDB()
-	query := c.Query("query")
-	if query == "" {
+	body := struct {
+		Query string `json:"query"`
+	}{}
+	if err := c.BodyParser(&body); err != nil {
+		return c.SendStatus(500)
+	}
+	if body.Query == "" {
 		if err := db.Select(&feeds, "SELECT * FROM feeds ORDER BY title;"); err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	} else {
-		if err := db.Select(&feeds, "SELECT * FROM feeds WHERE title LIKE ? OR link LIKE ? ORDER BY title;", "%"+query+"%", "%"+query+"%"); err != nil {
+		param := "%" + body.Query + "%"
+		if err := db.Select(&feeds, "SELECT * FROM feeds WHERE title LIKE ? OR link LIKE ? OR categories LIKE ? ORDER BY title;", param, param, param); err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	}
