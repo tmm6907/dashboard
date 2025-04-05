@@ -87,7 +87,7 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	return nil
 }
 
-func (h *Handler) SearchForFeed(c *fiber.Ctx) error {
+func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 	body := struct {
 		URL string `json:"url"`
 	}{}
@@ -95,29 +95,32 @@ func (h *Handler) SearchForFeed(c *fiber.Ctx) error {
 		return c.SendStatus(500)
 	}
 
-	rssParser := gofeed.NewParser()
+	if body.URL != "" {
+		rssParser := gofeed.NewParser()
 
-	feedData, err := rssParser.ParseURL(body.URL)
-	if err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-	if feedData.Image == nil {
-		ogImage, err := utils.GetOGImage(body.URL)
-		if err == nil {
-			feedData.Image = &gofeed.Image{URL: ogImage}
-		} else {
+		feedData, err := rssParser.ParseURL(body.URL)
+		if err != nil {
 			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
+		if feedData.Image == nil {
+			ogImage, err := utils.GetOGImage(body.URL)
+			if err == nil {
+				feedData.Image = &gofeed.Image{URL: ogImage}
+			} else {
+				log.Error(err)
+			}
+		}
+		data := map[string]any{
+			"title":       feedData.Title,
+			"description": feedData.Description,
+			"image":       feedData.Image,
+			"items":       feedData.Items,
+		}
+		return c.JSON(data)
 	}
+	return c.Status(http.StatusBadRequest).SendString("url must not be empty")
 
-	data := map[string]any{
-		"title":       feedData.Title,
-		"description": feedData.Description,
-		"image":       feedData.Image,
-		"items":       feedData.Items,
-	}
-	return c.JSON(data)
 }
 
 func (h *Handler) FollowFeed(c *fiber.Ctx) error {

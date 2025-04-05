@@ -7,7 +7,7 @@
     const getSavedItems = async () => {
         try {
             let response = await fetch(
-                `https://api.mashboard.app/api/feeds/items/saved/`,
+                `http://localhost:8080/api/feeds/items/saved/`,
                 {
                     credentials: "include",
                 },

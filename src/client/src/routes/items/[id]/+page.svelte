@@ -19,7 +19,7 @@
                 return;
             }
             let response = await fetch(
-                "https://api.mashboard.app/api/feeds/items/" + id,
+                "http://localhost:8080/api/feeds/items/" + id,
                 {
                     credentials: "include",
                 },
@@ -48,7 +48,7 @@
         }
         try {
             let response = await fetch(
-                `https://api.mashboard.app/api/feeds/items/${item.id}/bookmark`,
+                `http://localhost:8080/api/feeds/items/${item.id}/bookmark`,
                 {
                     method: "POST",
                     credentials: "include",
