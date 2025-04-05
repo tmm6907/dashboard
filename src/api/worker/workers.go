@@ -145,7 +145,7 @@ func (h *Handler) FetchRSSFeeds() {
 
 func (h *Handler) StartRSSFetcher(interval *time.Duration) {
 	if interval == nil {
-		defaultDuration := 1 * time.Minute
+		defaultDuration := 10 * time.Minute
 		interval = &defaultDuration
 	}
 	ticker := time.NewTicker(*interval)
