@@ -17,20 +17,6 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false // File does not exist
-		}
-	}
-	if info.IsDir() {
-		log.Debug("is a dir2ectory")
-		return false
-	}
-	return !info.IsDir() // Returns false if it's a directory
-}
-
 func initDB() (*sqlx.DB, error) {
 	dbName := "mashboard.sqlite"
 	buildFile := "build.sql"
@@ -125,12 +111,16 @@ func main() {
 	feedItemRoutes := feedRoutes.Group("/items")
 	feedRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
 	feedRoutes.Post("/", routesHandler.CreateFeed)
+	feedRoutes.Post("/search", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
 	feedRoutes.Post("/search/new", routesHandler.CheckAuthHandler(), routesHandler.SearchForNewFeedByURL)
 	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
 	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
 	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
 	feedItemRoutes.Get("/:id", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItem)
 	feedItemRoutes.Post("/:id/bookmark", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
+
+	userRoutes := apiRoutes.Group("/user")
+	userRoutes.Get("/", routesHandler.GetUser)
 
 	authRoutes := server.Group("/auth")
 	authRoutes.Get("/login", routesHandler.LoginHandler)

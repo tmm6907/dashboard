@@ -1,9 +1,22 @@
 <script>
+    import { triggerAlert } from "$lib";
     import { profileData } from "$lib/state.svelte";
     import { onMount } from "svelte";
 
+    const copyToClipboard = async () => {
+        navigator.clipboard
+            .writeText(profileData.mashboardEmail)
+            .then(() => {
+                triggerAlert("Copied to clipboard!", { closable: true });
+            })
+            .catch((err) => {
+                // Handle errors (e.g., permission issues)
+                console.error("Failed to copy text: " + err);
+            });
+    };
+
     const logout = () => {
-        fetch("http://localhost:8080/auth/logout/", {
+        fetch("https://api.mashboard.app/auth/logout/", {
             method: "GET",
             credentials: "include", // Important for cookies/sessions
         })
@@ -86,7 +99,7 @@
             <span class="dock-label text-xs">Home</span>
         </div>
     </a>
-    <button class="relative btn btn-ghost py-8" onclick={toggleMenu}>
+    <div class="relative btn btn-ghost py-8" onclick={toggleMenu}>
         <div style="display: block;">
             <div><i class="fa-solid fa-user"></i></div>
             <span class="dock-label text-xs">Profile</span>
@@ -95,16 +108,75 @@
             id="profile-menu"
             class="absolute bg-base-200 -top-60 -left-30 hidden rounded-lg py-4"
         >
-            <div>
-                <label for="mashboard-email">{profileData.mashboardEmail}</label
-                >
-            </div>
-            <ul class=" menu rounded-box w-[24ch]">
+            <div></div>
+            <ul class="menu pl-0 rounded-box w-[24ch]">
+                <li>
+                    <div class="dropdown">
+                        <div
+                            tabindex="0"
+                            role="button"
+                            onclick={(e) => e.stopPropagation()}
+                            class="btn"
+                        >
+                            Theme
+                            <svg
+                                width="12px"
+                                height="12px"
+                                class="inline-block h-2 w-2 fill-current opacity-60"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 2048 2048"
+                            >
+                                <path
+                                    d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"
+                                ></path>
+                            </svg>
+                        </div>
+                        <ul
+                            tabindex="0"
+                            class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl"
+                        >
+                            <li>
+                                <input
+                                    type="radio"
+                                    name="theme-dropdown"
+                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+                                    aria-label="Default"
+                                    value="light"
+                                />
+                            </li>
+                            <li>
+                                <input
+                                    type="radio"
+                                    name="theme-dropdown"
+                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+                                    aria-label="Retro"
+                                    value="dark"
+                                />
+                            </li>
+                            <li>
+                                <input
+                                    type="radio"
+                                    name="theme-dropdown"
+                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+                                    aria-label="Cyberpunk"
+                                    value="emerald"
+                                />
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button
+                        onclick={copyToClipboard}
+                        class="btn btn-ghost text-accent"
+                        ><i class="fa-regular fa-clipboard"></i> Mashboard Email</button
+                    >
+                </li>
                 <li><a>View Profile</a></li>
                 <li><a>Collections</a></li>
                 <li><a>Settings</a></li>
                 <li><a>Logout</a></li>
             </ul>
         </div>
-    </button>
+    </div>
 </div>

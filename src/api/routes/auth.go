@@ -36,7 +36,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 		var userID utils.UUID
 		db := h.GetDB()
 		newUUID := uuid.New()
-		mashboardEmail := newUUID.String() + "@mash.board"
+		mashboardEmail := newUUID.String() + "@mashboard.app"
 		err = db.QueryRow("SELECT id FROM users WHERE oauth_id = ? AND oauth_provider = 'google'", userInfo["oauthID"]).
 			Scan(&userID)
 
