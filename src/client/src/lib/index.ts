@@ -1,5 +1,7 @@
 // place files you want to import through the `$lib` alias in this folder.
 
+import { alertState } from "./state.svelte";
+
 export interface FeedData {
     latest: any[]; // Replace 'any' with your specific type if possible
     items: any[];  // Replace 'any' with your specific type if possible
@@ -68,3 +70,31 @@ export const getTimeAgo = (time: string) => {
     if (hours > 0) return `${hours}h ago`;
     return `${minutes}m ago`;
 };
+
+export interface AlertConfig {
+    type: string;
+    duration: number;
+    closable: boolean;
+}
+
+
+export const triggerAlert = (msg: string, config: AlertConfig) => {
+    if (msg === "") {
+        throw new Error("msg may not be empty")
+    }
+    alertState.msg = msg;
+    if (config.type) {
+        alertState.type = config.type
+    }
+    if (config.duration) {
+        alertState.duration = config.duration
+    }
+    if (config.closable) {
+        alertState.closable = config.closable
+    }
+    alertState.showAlert = true
+    setTimeout(() => {
+        console.log("closing");
+        alertState.showAlert = false;
+    }, alertState.duration);
+}

@@ -9,8 +9,11 @@
         loading = true;
         try {
             const response = await fetch(
-                `https://api.mashboard.app/api/feeds/?query=${feedQuery}`,
+                `https://api.mashboard.app/api/feeds/`,
                 {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: feedQuery }),
                     credentials: "include",
                 },
             );

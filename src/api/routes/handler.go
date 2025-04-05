@@ -145,7 +145,7 @@ func (h *Handler) CheckAuthHandler() fiber.Handler {
 			db := h.GetDB()
 			if err := db.Get(&user, "SELECT * FROM users WHERE oauth_id = ?;", tokenData["oauth_id"]); err != nil {
 				newUUID := uuid.New()
-				mashboardEmail := newUUID.String() + "@mash.board"
+				mashboardEmail := newUUID.String() + "@mashboard.app"
 				_, err := db.Exec("INSERT INTO users (id, oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?, ?)",
 					newUUID[:], "google", tokenData["user_id"], tokenData["firstName"], tokenData["lastName"], mashboardEmail)
 				if err != nil {
