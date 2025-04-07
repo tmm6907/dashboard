@@ -3,6 +3,19 @@
     import { profileData } from "$lib/state.svelte";
     import { onMount } from "svelte";
 
+    // $effect(() => {
+    //     localStorage.setItem("theme", appState.theme);
+    // });
+    // onMount(() => {
+    //     appState.theme = localStorage.getItem("theme") || "dark";
+    // });
+
+    let toggled = $state(false);
+
+    const saveTheme = () => {
+        localStorage.setItem("isToggled", JSON.stringify(toggled));
+    };
+
     const copyToClipboard = async () => {
         navigator.clipboard
             .writeText(profileData.mashboardEmail)
@@ -26,8 +39,19 @@
     const toggleMenu = () => {
         const menu = document.getElementById("profile-menu");
         if (menu.classList.contains("hidden")) {
+            const handleOutsideClick = (e) => {
+                if (!menu.contains(e.target)) {
+                    menu.classList.add("hidden");
+                    document.removeEventListener("click", handleOutsideClick);
+                }
+            };
+            menu?.classList.remove("hidden");
+            setTimeout(() => {
+                document.addEventListener("click", handleOutsideClick);
+            }, 0);
+            return;
         }
-        menu.classList.toggle("hidden");
+        menu.classList.add("hidden");
     };
 
     const closeSubscribeMenu = () => {
@@ -62,7 +86,9 @@
             closeSubscribeMenu();
         }
     };
-    onMount(() => {});
+    onMount(() => {
+        toggled = JSON.parse(localStorage.getItem("isToggeled") || "false");
+    });
 </script>
 
 <div
@@ -99,78 +125,39 @@
             <span class="dock-label text-xs">Home</span>
         </div>
     </a>
-    <div class="relative btn btn-ghost py-8" onclick={toggleMenu}>
-        <div style="display: block;">
+    <div class="relative flex items-center">
+        <div class="block btn btn-ghost my-auto" onclick={toggleMenu}>
             <div><i class="fa-solid fa-user"></i></div>
-            <span class="dock-label text-xs">Profile</span>
+            <div class=" dock-label text-xs">Profile</div>
         </div>
         <div
             id="profile-menu"
-            class="absolute bg-base-200 -top-60 -left-30 hidden rounded-lg py-4"
+            class="absolute bg-base-200 -top-70 -left-30 hidden rounded-lg py-4"
         >
-            <div></div>
-            <ul class="menu pl-0 rounded-box w-[24ch]">
-                <li>
-                    <div class="dropdown">
-                        <div
-                            tabindex="0"
-                            role="button"
-                            onclick={(e) => e.stopPropagation()}
-                            class="btn"
-                        >
-                            Theme
-                            <svg
-                                width="12px"
-                                height="12px"
-                                class="inline-block h-2 w-2 fill-current opacity-60"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 2048 2048"
-                            >
-                                <path
-                                    d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"
-                                ></path>
-                            </svg>
-                        </div>
-                        <ul
-                            tabindex="0"
-                            class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl"
-                        >
-                            <li>
-                                <input
-                                    type="radio"
-                                    name="theme-dropdown"
-                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-                                    aria-label="Default"
-                                    value="light"
-                                />
-                            </li>
-                            <li>
-                                <input
-                                    type="radio"
-                                    name="theme-dropdown"
-                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-                                    aria-label="Retro"
-                                    value="dark"
-                                />
-                            </li>
-                            <li>
-                                <input
-                                    type="radio"
-                                    name="theme-dropdown"
-                                    class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-                                    aria-label="Cyberpunk"
-                                    value="emerald"
-                                />
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+            <ul class="menu px-0 rounded-box w-[24ch]">
                 <li>
                     <button
                         onclick={copyToClipboard}
                         class="btn btn-ghost text-accent"
                         ><i class="fa-regular fa-clipboard"></i> Mashboard Email</button
                     >
+                </li>
+                <li class="">
+                    <form class="flex justify-between rounded-circle">
+                        <div>
+                            <label for="theme-selector">Theme</label>
+                        </div>
+                        <div>
+                            <input
+                                id="theme-selector"
+                                type="checkbox"
+                                onchange={saveTheme}
+                                value="emerald"
+                                checked={toggled}
+                                class="toggle theme-controller"
+                            />
+                        </div>
+                    </form>
                 </li>
                 <li><a>View Profile</a></li>
                 <li><a>Collections</a></li>

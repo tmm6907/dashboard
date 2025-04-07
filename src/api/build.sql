@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS feed_items (
     FOREIGN KEY (feed_id) REFERENCES feeds(feed_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS item_categories (
+    name TEXT PRIMARY KEY NOT NULL CHECK(name != '')
+);
+
 CREATE TABLE IF NOT EXISTS feed_follows (
     user_id BLOB NOT NULL,
     feed_id BLOB NOT NULL,

@@ -1,4 +1,8 @@
 
+// export const appState = $state({
+//     theme: false
+// })
+
 export const alertState = $state({
     showAlert: false,
     msg: "",

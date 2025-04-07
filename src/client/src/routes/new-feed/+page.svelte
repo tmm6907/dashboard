@@ -1,5 +1,13 @@
 <script>
+    import { onMount } from "svelte";
     import NewFeedForm from "../../components/NewFeedForm.svelte";
+    function setDataTheme() {
+        // Set the data-theme attribute on the <html> element
+        let theme = JSON.parse(localStorage.getItem("isToggled") || "false");
+    }
+    onMount(() => {
+        setDataTheme();
+    });
 </script>
 
 <div class="p-8">

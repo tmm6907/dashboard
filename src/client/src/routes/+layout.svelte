@@ -1,12 +1,11 @@
 <script>
-    import { profileData } from "$lib/state.svelte";
     import { onMount } from "svelte";
     import BottomNav from "../components/BottomNav.svelte";
     import SubscribeForm from "../components/SubscribeForm.svelte";
     import "../global.css";
     import Alert from "../components/Alert.svelte";
+    import { profileData } from "$lib/state.svelte";
     let { children } = $props();
-
     async function getProfileData() {
         try {
             let response = await fetch("http://localhost:8080/api/user", {
