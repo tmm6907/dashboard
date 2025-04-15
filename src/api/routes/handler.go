@@ -183,7 +183,7 @@ func (h *Handler) GenerateJWTToken(oauthID string, fname string, lname string, a
 func (h *Handler) GetUserFromToken(tokenString string) (*models.User, error) {
 	token, err := h.ParseTokenString(tokenString)
 	if err != nil {
-		log.Error(err)
+		log.Error(err, tokenString)
 		return nil, err
 	}
 	// log.Debug(token)
