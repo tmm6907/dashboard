@@ -97,7 +97,7 @@ func main() {
 	var GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		RedirectURL:  "https://api.masboard.app/auth/callback",
+		RedirectURL:  "https://api.mashboard.app/auth/callback",
 		Scopes:       []string{"profile", "email"},
 		Endpoint:     google.Endpoint,
 	}
