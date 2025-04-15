@@ -55,7 +55,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString("Unable to generate auth token")
 		}
-		return c.Redirect("http://localhost:4173")
+		return c.Redirect("https://mashboard.app")
 	}
 }
 

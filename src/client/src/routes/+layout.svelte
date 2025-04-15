@@ -9,7 +9,7 @@
     async function getProfileData() {
         try {
             let response = await fetch(
-                "http://api.mashboard.app:8080/api/user",
+                "https://api.mashboard.app:8080/api/user",
                 {
                     credentials: "include",
                 },
