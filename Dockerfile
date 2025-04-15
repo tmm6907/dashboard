@@ -19,6 +19,12 @@ RUN apk add nss-tools
 COPY --from=build /build/caddy /usr/bin/caddy
 
 
+# Set a volume for persistent data storage
+VOLUME ["/data"]
+
+# Ensure permissions for the /data directory
+RUN mkdir -p /data && chmod -R 755 /data
+
 # Expose Caddy ports
 EXPOSE 80 443 25
 
