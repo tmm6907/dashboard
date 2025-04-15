@@ -8,9 +8,12 @@
     let { children } = $props();
     async function getProfileData() {
         try {
-            let response = await fetch("http://localhost:8080/api/user", {
-                credentials: "include",
-            });
+            let response = await fetch(
+                "http://api.mashboard.app:8080/api/user",
+                {
+                    credentials: "include",
+                },
+            );
             if (response.status == 302) {
                 console.log("redirect");
                 window.location.href = await response.text();
