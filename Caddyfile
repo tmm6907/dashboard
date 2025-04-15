@@ -1,3 +1,7 @@
+{
+    storage file_system /data
+}
+
 
 mashboard.app {
 	@cors_options method OPTIONS
