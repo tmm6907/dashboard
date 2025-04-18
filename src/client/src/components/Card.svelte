@@ -25,6 +25,7 @@
                 `https://api.mashboard.app/api/feeds/items/${item.id}/bookmark`,
                 {
                     method: "POST",
+                    credentials: "include",
                 },
             );
             if (response.status == 302) {
