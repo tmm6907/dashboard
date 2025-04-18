@@ -21,7 +21,7 @@
         try {
             console.log(feedData.url);
             let response = await fetch(
-                "https://api.mashboard.app/api/feeds/find",
+                "https://api.mashboard.app/api/feeds/search/new",
                 {
                     method: "POST",
                     headers: {
