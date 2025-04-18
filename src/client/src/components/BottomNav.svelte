@@ -34,7 +34,7 @@
             credentials: "include", // Important for cookies/sessions
         })
             .then(() => console.log("Logged out"))
-            .catch(console.error);
+            .catch((e) => console.error(e));
     };
     const toggleMenu = () => {
         const menu = document.getElementById("profile-menu");
