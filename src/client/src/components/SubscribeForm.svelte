@@ -13,7 +13,7 @@
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ query: feedQuery }),
+                    body: JSON.stringify({ url: feedQuery }),
                     credentials: "include",
                 },
             );
