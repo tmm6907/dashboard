@@ -195,6 +195,9 @@ func (h *Handler) GetUserFromToken(tokenString string) (*models.User, error) {
 			var user models.User
 			if err = db.Get(&user, "SELECT * from users WHERE oauth_id = ? LIMIT 1 ;", oauthID); err != nil {
 				log.Info("OAUTH: ", oauthID)
+				var users []models.User
+				db.Select(&users, "SELECT * from users WHERE oauth_id = ? LIMIT 1 ;", oauthID)
+				log.Info("Users: ", users)
 				return nil, err
 			}
 			return &user, nil
