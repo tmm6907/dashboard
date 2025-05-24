@@ -23,6 +23,7 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
                 duration: 3000,
                 closable: true,
             });
+            window.location.href = "https://mashboard.app/login"
             return;
         }
         console.log(response.status)
