@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
     volumes:
-      - api_db:/src/api
+      - api_db:/src/api/db
     networks:
       - internal
 
