@@ -8,8 +8,8 @@
         let results = await fetchFeedItems(feedState.category);
         console.log("category changed", feedState.category);
         console.log(results);
-        feedState.feedItems = sortFeedItems(results.items ? results.items : []);
-        console.log("coll", results.collections);
+        feedState.feedItems = sortFeedItems(results.items);
+        console.log("collections", results.collections);
         feedState.feedCollections = results.collections;
 
         feedState.feedLatest = sortFeedItems(

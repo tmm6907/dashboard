@@ -42,7 +42,10 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
 
 export const sortFeedItems = (items: any[]) => {
     // sort items on item.pubDate
-
+    if (!Array.isArray(items)) {
+        console.warn("sortFeedItems: expected array but got", items);
+        return [];
+    }
     return items.sort(
         (a, b) => new Date(b.pub_date) - new Date(a.pub_date)
     );
