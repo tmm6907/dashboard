@@ -25,7 +25,7 @@
                 },
             );
             if (response.status == 401) {
-                window.location.href = "https://api.mashboard.app/login";
+                window.location.href = "https://mashboard.app/login";
                 return;
             }
             if (!response.ok) {
@@ -54,7 +54,7 @@
                 },
             );
             if (response.status == 401) {
-                window.location.href = "https://api.mashboard.app/login";
+                window.location.href = "https://mashboard.app/login";
                 return;
             }
             if (response.status != 200) {
