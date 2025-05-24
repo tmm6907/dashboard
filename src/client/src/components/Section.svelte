@@ -17,14 +17,18 @@
             ? ''
             : 'flex'} section-container gap-8 overflow-x-auto pb-8 whitespace-nowrap"
     >
-        {#if feed && items}
-            {#each items.slice(0, vertical ? items.length : max) as item}
-                <Card {item} />
-            {/each}
+        {#if feed}
+            {#if items}
+                {#each items.slice(0, vertical ? items.length : max) as item}
+                    <Card {item} />
+                {/each}
+            {/if}
         {:else}
-            {#each items.slice(0, vertical ? items.length : max) as item}
-                <Card {item} {feed} />
-            {/each}
+            {#if items}
+                {#each items.slice(0, vertical ? items.length : max) as item}
+                    <Card {item} {feed} />
+                {/each}
+            {/if}
             <Card {feed} />
         {/if}
     </div>
