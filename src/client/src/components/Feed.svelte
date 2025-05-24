@@ -4,7 +4,7 @@
 </script>
 
 <div id="feed-container" class="h-full flex flex-col spacing-y-4 px-6">
-    {#if feedState.feedItems.length > 25}
+    {#if feedState.feedItems && feedState.feedItems.length > 25}
         <Section heading="Latest" items={feedState.feedLatest} />
     {/if}
 

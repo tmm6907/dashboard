@@ -6,7 +6,7 @@
 <div class="pt-2 pb-4 border-b border-neutral-500">
     <div class="flex justify-between items-center bold">
         <h2 class="prose prose-2xl">{heading}</h2>
-        {#if items.length > max && !vertical}
+        {#if items && items.length > max && !vertical}
             <span class="text-accent"
                 >Show All <i class="fa-solid fa-caret-right"></i></span
             >
