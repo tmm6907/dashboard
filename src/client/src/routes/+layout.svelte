@@ -17,10 +17,10 @@
                 console.error("Not logged in");
                 triggerAlert("Not logged in", {
                     type: "alert-error",
-                    duration: 300,
+                    duration: 3000,
                     closable: true,
                 });
-                return;
+                window.location.href = "https://mashboard.app/login";
             }
             if (response.status != 200) {
                 let err = await response.text();

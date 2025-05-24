@@ -21,7 +21,7 @@
             if (response.status == 401) {
                 triggerAlert("Not logged in", {
                     type: "alert-error",
-                    duration: 300,
+                    duration: 3000,
                     closable: true,
                 });
                 return;

@@ -17,8 +17,12 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
             credentials: "include",
         });
 
-        if (response.status == 401) {
-            window.location.href = "https://mashboard.app/login";
+        if (response.status == 302) {
+            triggerAlert("Not logged in", {
+                type: "alert-error",
+                duration: 3000,
+                closable: true,
+            });
             return;
         }
         console.log(response.status)
