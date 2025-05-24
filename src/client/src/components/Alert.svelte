@@ -24,7 +24,7 @@
     <span class="mr-12">{alertState.msg}</span>
     {#if alertState.closable}
         <button
-            class="btn btn-ghost btn-xs absolute top-4 right-0"
+            class="btn btn-ghost btn-sm absolute top-0 right-0"
             onclick={closeAlert}><i class="fa fa-close"></i></button
         >
     {/if}
