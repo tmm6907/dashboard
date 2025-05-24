@@ -101,12 +101,12 @@
 <div
     class="fixed bottom-0 left-0 bg-base-200 text-base-content grid grid-cols-5 gap-4 w-full"
 >
-    <svelte:link to="/saved" class="btn btn-ghost py-8 text-ren">
+    <a href="/saved" class="btn btn-ghost py-8 text-ren">
         <div style="display: block;">
             <div><i class="fa-solid fa-bookmark"></i></div>
             <span class="dock-label text-xs">Saved</span>
         </div>
-    </svelte:link>
+    </a>
 
     <button class="btn btn-ghost py-8">
         <div style="display: block;">
@@ -126,12 +126,12 @@
         </div>
     </button>
 
-    <svelte:link to="/" class="btn btn-ghost py-8">
+    <a href="/" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-house"></i></div>
             <span class="dock-label text-xs">Home</span>
         </div>
-    </svelte:link>
+    </a>
     <div class="relative flex items-center">
         <div class="block btn btn-ghost my-auto" onclick={toggleMenu}>
             <div><i class="fa-solid fa-user"></i></div>
