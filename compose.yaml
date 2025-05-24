@@ -41,7 +41,7 @@ services:
       - "8888:8888"
 
     volumes:
-      - mail_db:/src/mailserver/mail.db
+      - mail_db:/src/mailserver
     networks:
       - internal
 
