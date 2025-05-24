@@ -17,7 +17,7 @@
             ? ''
             : 'flex'} section-container gap-8 overflow-x-auto pb-8 whitespace-nowrap"
     >
-        {#if feed}
+        {#if feed && items}
             {#each items.slice(0, vertical ? items.length : max) as item}
                 <Card {item} />
             {/each}
