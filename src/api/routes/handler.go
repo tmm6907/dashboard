@@ -128,7 +128,7 @@ func (h *Handler) CheckAuthHandler() fiber.Handler {
 		if tokenString == "" {
 			log.Error("token is empty")
 			redirectURL := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
-			return c.Status(http.StatusFound).SendString(redirectURL)
+			return c.Redirect(redirectURL)
 		}
 		if !h.IsValidJWT(tokenString) {
 			log.Error("invalid token, resetting")
