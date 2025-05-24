@@ -118,18 +118,20 @@
             <div>
                 <h3 class="text-secondary">Latest Posts</h3>
                 <ul class="list bg-base-100">
-                    {#each feedData.items.slice(0, 10) as item}
-                        <li class="grid grid-cols-5 gap-2 py-4">
-                            <div>
-                                <span class="text-xs prose"
-                                    >{getTimeAgoAll(item.published)}</span
-                                >
-                            </div>
-                            <div class="col-span-4">
-                                <span>{item.title}</span>
-                            </div>
-                        </li>
-                    {/each}
+                    {#if feedData.items}
+                        {#each feedData.items.slice(0, 10) as item}
+                            <li class="grid grid-cols-5 gap-2 py-4">
+                                <div>
+                                    <span class="text-xs prose"
+                                        >{getTimeAgoAll(item.published)}</span
+                                    >
+                                </div>
+                                <div class="col-span-4">
+                                    <span>{item.title}</span>
+                                </div>
+                            </li>
+                        {/each}
+                    {/if}
                 </ul>
             </div>
         </div>
