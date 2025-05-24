@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./src/api/db:/src/api/db
+      - ./src/api/db:/root/db
     networks:
       - internal
 
@@ -41,7 +41,7 @@ services:
       - "8888:8888"
 
     volumes:
-      - mail_db:/src/mailserver
+      - mail_db:/mail
     networks:
       - internal
 
