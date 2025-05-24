@@ -126,7 +126,7 @@ func (h *Handler) CheckAuthHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		tokenString := c.Cookies("token")
 		if tokenString == "" {
-			log.Error("token is empty")
+			log.Error("redirecting to google token empty")
 			redirectURL := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
 			return c.Redirect(redirectURL)
 		}

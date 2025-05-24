@@ -33,11 +33,18 @@
             method: "GET",
             credentials: "include", // Important for cookies/sessions
         })
-            .then(() => console.log("Logged out"))
+            .then(() => {
+                console.log("Logged out");
+                window.location.href = "https://mashboard.app/login";
+            })
             .catch((e) => console.error(e));
     };
     const toggleMenu = () => {
         const menu = document.getElementById("profile-menu");
+        if (!menu) {
+            console.error("profile menu not found");
+            return;
+        }
         if (menu.classList.contains("hidden")) {
             const handleOutsideClick = (e) => {
                 if (!menu.contains(e.target)) {
