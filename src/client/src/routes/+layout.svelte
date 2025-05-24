@@ -5,6 +5,8 @@
     import "../global.css";
     import Alert from "../components/Alert.svelte";
     import { profileData } from "$lib/state.svelte";
+    import { triggerAlert } from "$lib";
+
     let { children } = $props();
     async function getProfileData() {
         try {
@@ -12,7 +14,12 @@
                 credentials: "include",
             });
             if (response.status == 401) {
-                window.location.href = "https://mashboard.app/login";
+                console.error("Not logged in");
+                triggerAlert("Not logged in", {
+                    type: "alert-error",
+                    duration: 300,
+                    closable: true,
+                });
                 return;
             }
             if (response.status != 200) {
