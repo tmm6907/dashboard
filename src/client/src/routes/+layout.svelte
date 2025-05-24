@@ -11,13 +11,9 @@
             let response = await fetch("https://api.mashboard.app/api/user", {
                 credentials: "include",
             });
-            if (response.status == 302) {
-                console.log("redirect");
-                window.location.href = await response.text();
+            if (response.status == 401) {
+                window.location.href = "https://api.mashboard.app/login";
                 return;
-            }
-            if (response.status === 401) {
-                window.location.href = "https://api.mashboard.app/auth/login";
             }
             if (response.status != 200) {
                 let err = await response.text();

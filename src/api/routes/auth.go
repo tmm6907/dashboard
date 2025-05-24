@@ -14,7 +14,7 @@ import (
 
 func (h *Handler) GoogleOauthLoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
-	return c.Status(fiber.StatusFound).SendString(url)
+	return c.Redirect(url)
 }
 
 func (h *Handler) CallbackHandler() fiber.Handler {

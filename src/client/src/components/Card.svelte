@@ -28,8 +28,8 @@
                     credentials: "include",
                 },
             );
-            if (response.status == 302) {
-                window.location.href = await response.text();
+            if (response.status == 401) {
+                window.location.href = "https://api.mashboard.app/login";
                 return;
             }
             if (response.status != 200) {
