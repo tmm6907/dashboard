@@ -26,6 +26,7 @@ services:
     container_name: client-server
     environment:
       - PORT=3030
+      - HOSTNAME=mashboard.app
     ports:
       - "3030:3030"
     networks:
