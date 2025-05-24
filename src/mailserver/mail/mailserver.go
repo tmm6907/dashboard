@@ -12,7 +12,7 @@ import (
 
 	smtp "github.com/emersion/go-smtp"
 	"github.com/jmoiron/sqlx"
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Session struct {
@@ -81,7 +81,7 @@ func populateDB(db *sqlx.DB) error {
 }
 
 func (b Backend) NewSession(c *smtp.Conn) (smtp.Session, error) {
-	db, err := sqlx.Open("sqlite", "mail.db")
+	db, err := sqlx.Open("sqlite3", "mail.db")
 	if err != nil {
 		return &Session{}, err
 	}
