@@ -1,4 +1,5 @@
 <script>
+    import { triggerAlert } from "$lib";
     import { onMount } from "svelte";
 
     let feedQuery = $state(""); // Search query
@@ -18,7 +19,11 @@
                 },
             );
             if (response.status == 401) {
-                window.location.href = "https://mashboard.app/login";
+                triggerAlert("Not logged in", {
+                    type: "alert-error",
+                    duration: 300,
+                    closable: true,
+                });
                 return;
             }
             console.log(response.status);
