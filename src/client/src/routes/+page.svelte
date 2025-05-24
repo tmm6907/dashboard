@@ -8,13 +8,17 @@
         let results = await fetchFeedItems(feedState.category);
         console.log("category changed", feedState.category);
         console.log(results);
+        if (!results) {
+            console.error("failed to update feed");
+            return;
+        }
         feedState.feedItems = sortFeedItems(results.items);
         console.log("collections", results.collections);
+        console.log("collections", feedState.feedItems);
+
         feedState.feedCollections = results.collections;
 
-        feedState.feedLatest = sortFeedItems(
-            results.latest ? results.latest : [],
-        );
+        feedState.feedLatest = sortFeedItems(results.latest);
     }
     $effect(async () => {
         await updateFeed();
