@@ -40,6 +40,7 @@ func (h *Handler) CallbackHandler() fiber.Handler {
 
 		if err == sql.ErrNoRows {
 			// Insert new user
+			log.Info("no user of oauth", userInfo["oauthID"])
 			_, err := db.Exec("INSERT INTO users (id, oauth_provider, oauth_id, first_name, last_name, mashboard_email) VALUES (?, ?, ?, ?, ?, ?)",
 				newUUID[:], "google", userInfo["oauthID"], userInfo["firstName"], userInfo["lastName"], mashboardEmail)
 			if err != nil {
@@ -65,7 +66,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour), // Set expiration in the past
 		HTTPOnly: true,
-		Secure:   false, // Set to true if using HTTPS
+		Secure:   false,
 		SameSite: "Lax",
 	})
 	return c.Status(fiber.StatusOK).SendString("Logged out")
