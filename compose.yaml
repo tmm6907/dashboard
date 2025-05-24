@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./src/api/db:/root/db
+      - api_db:/root/db
     networks:
       - internal
 
@@ -69,6 +69,7 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  api_db:
   mail_db:
 
 
