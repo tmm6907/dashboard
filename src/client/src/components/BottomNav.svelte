@@ -162,7 +162,7 @@
                 <li><a>View Profile</a></li>
                 <li><a>Collections</a></li>
                 <li><a>Settings</a></li>
-                <li><a>Logout</a></li>
+                <li><button onclick={logout}>Logout</button></li>
             </ul>
         </div>
     </div>

@@ -12,7 +12,7 @@ import (
 	"github.com/tmm6907/dashboard/utils"
 )
 
-func (h *Handler) LoginHandler(c *fiber.Ctx) error {
+func (h *Handler) GoogleOauthLoginHandler(c *fiber.Ctx) error {
 	url := auth.GetLoginURL(h.GetOauthConfig(), "random-state")
 	return c.Status(fiber.StatusFound).SendString(url)
 }

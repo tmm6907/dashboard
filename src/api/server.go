@@ -109,7 +109,8 @@ func main() {
 	feedRoutes := apiRoutes.Group("/feeds")
 	feedItemRoutes := feedRoutes.Group("/items")
 	feedRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
-	feedRoutes.Post("/", routesHandler.CreateFeed)
+	feedRoutes.Post("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
+	feedRoutes.Post("/new", routesHandler.CheckAuthHandler(), routesHandler.CreateFeed)
 	feedRoutes.Post("/search", routesHandler.CheckAuthHandler(), routesHandler.GetFeeds)
 	feedRoutes.Post("/search/new", routesHandler.CheckAuthHandler(), routesHandler.SearchForNewFeedByURL)
 	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
@@ -122,7 +123,7 @@ func main() {
 	userRoutes.Get("/", routesHandler.GetUser)
 
 	authRoutes := server.Group("/auth")
-	authRoutes.Get("/login", routesHandler.LoginHandler)
+	authRoutes.Get("/login", routesHandler.GoogleOauthLoginHandler)
 	authRoutes.Get("/logout", routesHandler.Logout)
 	authRoutes.Get("/callback", routesHandler.CallbackHandler())
 
