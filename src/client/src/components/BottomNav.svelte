@@ -101,7 +101,7 @@
 <div
     class="fixed bottom-0 left-0 bg-base-200 text-base-content grid grid-cols-5 gap-4 w-full"
 >
-    <a href="/saved" class="btn btn-ghost py-8 text-ren">
+    <a href="https://mashboard.app/saved" class="btn btn-ghost py-8 text-ren">
         <div style="display: block;">
             <div><i class="fa-solid fa-bookmark"></i></div>
             <span class="dock-label text-xs">Saved</span>
@@ -126,7 +126,7 @@
         </div>
     </button>
 
-    <a href="/" class="btn btn-ghost py-8">
+    <a href="https://mashboard.app" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-house"></i></div>
             <span class="dock-label text-xs">Home</span>
