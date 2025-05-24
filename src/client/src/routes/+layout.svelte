@@ -20,7 +20,6 @@
                     duration: 3000,
                     closable: true,
                 });
-                window.location.href = "https://mashboard.app/login";
             }
             if (response.status != 200) {
                 let err = await response.text();
