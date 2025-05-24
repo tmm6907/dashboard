@@ -101,12 +101,12 @@
 <div
     class="fixed bottom-0 left-0 bg-base-200 text-base-content grid grid-cols-5 gap-4 w-full"
 >
-    <a href="https://mashboard.app/saved" class="btn btn-ghost py-8 text-ren">
+    <svelte:link to="/saved" class="btn btn-ghost py-8 text-ren">
         <div style="display: block;">
             <div><i class="fa-solid fa-bookmark"></i></div>
             <span class="dock-label text-xs">Saved</span>
         </div>
-    </a>
+    </svelte:link>
 
     <button class="btn btn-ghost py-8">
         <div style="display: block;">
@@ -126,12 +126,12 @@
         </div>
     </button>
 
-    <a href="https://mashboard.app" class="btn btn-ghost py-8">
+    <svelte:link to="/" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-house"></i></div>
             <span class="dock-label text-xs">Home</span>
         </div>
-    </a>
+    </svelte:link>
     <div class="relative flex items-center">
         <div class="block btn btn-ghost my-auto" onclick={toggleMenu}>
             <div><i class="fa-solid fa-user"></i></div>
