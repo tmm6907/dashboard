@@ -20,10 +20,11 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 		log.Error("token should not be empty")
 		return c.SendStatus(http.StatusInternalServerError)
 	}
+	log.Info(token)
 	user, err := h.GetUserFromToken(token)
 	if err != nil {
 		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 	userID := user.ID
 

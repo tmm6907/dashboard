@@ -16,6 +16,9 @@
                 window.location.href = await response.text();
                 return;
             }
+            if (response.status === 401) {
+                window.location.href = "https://api.mashboard.app/auth/login";
+            }
             if (response.status != 200) {
                 throw new Error(await response.text());
             }

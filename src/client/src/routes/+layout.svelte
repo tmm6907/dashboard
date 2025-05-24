@@ -16,6 +16,9 @@
                 window.location.href = await response.text();
                 return;
             }
+            if (response.status === 401) {
+                window.location.href = "https://api.mashboard.app/auth/login";
+            }
             if (response.status != 200) {
                 let err = await response.text();
                 throw new Error(`unable to create feed: ${err}`);
