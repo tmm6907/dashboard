@@ -13,9 +13,9 @@
         {/if}
     </div>
     <div
-        class="{vertical
-            ? ''
-            : 'flex'} section-container gap-12 overflow-x-auto pb-8 whitespace-nowrap"
+        class="{vertical ? '' : 'flex'} section-container {vertical
+            ? 'gap-12'
+            : 'gap-8'} overflow-x-auto pb-8 whitespace-nowrap"
     >
         {#if feed}
             {#if items}
