@@ -13,10 +13,12 @@
         {/if}
     </div>
     <div
-        class="{vertical ? '' : 'flex'} section-container {vertical
-            ? 'gap-12'
-            : 'gap-8'} overflow-x-auto pb-8 whitespace-nowrap"
-    >
+    class="section-container overflow-x-auto pb-8 whitespace-nowrap"
+    class:flex-col={vertical}
+    class:gap-12={vertical}
+    class:flex={!vertical}
+    class:gap-8={!vertical}
+/>
         {#if feed}
             {#if items}
                 {#each items.slice(0, vertical ? items.length : max) as item}
