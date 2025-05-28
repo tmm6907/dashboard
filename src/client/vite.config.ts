@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
+	console.log(env.PUBLIC_HOSTNAME)
 	return {
 		plugins: [
 			sveltekit(),
