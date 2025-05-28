@@ -39,7 +39,7 @@ services:
       context: src/mailserver
       dockerfile: Dockerfile
     ports:
-      - "25:2525"
+      - "25:25"
       - "8888:8888"
 
     volumes:
