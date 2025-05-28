@@ -54,14 +54,16 @@
         class="text-base-content min-w-[32ch] max-w-[48ch]"
         onclick={goToFeedItem}
     >
-        <img
-            src={item.image
-                ? item.image
-                : "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
-            alt={item.alt_text ? item.alt_text : "feed item"}
-            loading="lazy"
-            class="h-auto w-full object-contain aspect-video"
-        />
+        <div class="bg-base-300">
+            <img
+                src={item.image
+                    ? item.image
+                    : "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
+                alt={item.alt_text ? item.alt_text : "feed item"}
+                loading="lazy"
+                class="h-auto w-full object-contain aspect-video"
+            />
+        </div>
         <span class=" text-wrap line-clamp-2">{item.title}</span>
         <div class="flex justify-between py-2">
             <div class="flex prose gap-2">
