@@ -52,8 +52,20 @@ func initDB() (*sqlx.DB, error) {
 
 func main() {
 	err := godotenv.Load()
+	var allowedOrigins []string
 	if err != nil {
 		log.Error(err)
+		allowedOrigins = []string{
+			"https://mashboard.app",
+			"https://50.116.53.73:4173",
+			"https://50.116.53.73:3030",
+		}
+	} else {
+		allowedOrigins = []string{
+			"http://127.0.0.1",
+			"http://127.0.0.1:4173",
+			"http://127.0.0.1:3030",
+		}
 	}
 
 	server := fiber.New()
@@ -62,16 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	// allowedOrigins := []string{
-	// 	"https://mashboard.app",
-	// 	"https://50.116.53.73:4173",
-	// 	"https://50.116.53.73:3030",
-	// }
-	allowedOrigins := []string{
-		"http://127.0.0.1",
-		"http://127.0.0.1:4173",
-		"http://127.0.0.1:3030",
-	}
+
 	allowedOriginsStr := strings.Join(allowedOrigins, ", ")
 
 	server.Use(cors.New(cors.Config{
