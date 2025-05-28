@@ -4,7 +4,8 @@ FROM golang:1.23.4 AS build
 WORKDIR /app
 
 # Copy and download dependencies
-COPY go.mod go.sum ./
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 
 # Copy the source code
