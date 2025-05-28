@@ -21,19 +21,6 @@ api.mashboard.app {
 }
 
 mail.mashboard.app {
-	tls internal
-
-	@smtp {
-		protocol smtp
-	}
-
-	handle @smtp {
-		reverse_proxy mail:25
-	}
+    tls internal
 }
 
-:25 {
-	handle {
-		reverse_proxy mail:25
-	}
-}
