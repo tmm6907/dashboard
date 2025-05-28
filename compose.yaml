@@ -27,6 +27,8 @@ services:
     environment:
       - PORT=3030
       - HOSTNAME=mashboard.app
+    env_file:
+      - .env.development
     ports:
       - "3030:3030"
     networks:
