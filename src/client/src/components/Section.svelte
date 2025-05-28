@@ -15,7 +15,7 @@
     <div
         class="{vertical
             ? ''
-            : 'flex'} section-container gap-8 overflow-x-auto pb-8 whitespace-nowrap"
+            : 'flex'} section-container gap-12 overflow-x-auto pb-8 whitespace-nowrap"
     >
         {#if feed}
             {#if items}

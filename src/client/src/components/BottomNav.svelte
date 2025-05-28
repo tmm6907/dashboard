@@ -108,12 +108,12 @@
         </div>
     </a>
 
-    <button class="btn btn-ghost py-8">
+    <a href="/discover" class="btn btn-ghost py-8">
         <div style="display: block;">
             <div><i class="fa-solid fa-globe"></i></div>
             <span class="dock-label text-xs">Discover</span>
         </div>
-    </button>
+    </a>
 
     <button
         id="showBoxBtn"

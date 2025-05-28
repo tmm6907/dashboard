@@ -33,13 +33,22 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 		if category == "technology" {
 			category = "tech"
 		}
-		err = h.QueryRows(&feedItems, "SELECT fi.*, f.title as feed_name FROM feed_items fi JOIN feeds f ON fi.feed_id = f.feed_id WHERE categories LIKE ? OR media_type LIKE ?;", "%"+category+"%", "%"+category+"%")
+		err = h.QueryRows(&feedItems, `
+		SELECT fi.*, f.title as feed_name 
+		FROM feed_items fi 
+		JOIN feeds f ON fi.feed_id = f.feed_id 
+		WHERE (categories LIKE ? OR media_type LIKE ?)
+		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`, "%"+category+"%", "%"+category+"%")
 		if err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	} else {
-		err = h.QueryRows(&feedItems, "SELECT fi.*, f.title as feed_name FROM feed_items fi JOIN feeds f ON fi.feed_id = f.feed_id;")
+		err = h.QueryRows(&feedItems, `
+		SELECT fi.*, f.title as feed_name 
+		FROM feed_items fi 
+		JOIN feeds f ON fi.feed_id = f.feed_id
+		WHERE datetime(fi.pub_date) >= datetime('now', '-7 days');`)
 		if err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -81,13 +90,13 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 		if err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
-		if time.Now().Sub(pubDate) <= 3*24*time.Hour {
+		if time.Now().Sub(pubDate) <= 72*time.Hour {
 			latest = append(latest, item)
 		}
 	}
 	return c.JSON(map[string]any{
-		"latest":      latest,
-		"items":       feedItems,
+		"latest":      latest,    //last 3 days
+		"items":       feedItems, //last 7 days
 		"collections": collections,
 	})
 }

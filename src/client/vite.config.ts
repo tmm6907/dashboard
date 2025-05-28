@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
 		server: {
 			host: "0.0.0.0",
 			port: 3030,
-			allowedHosts: [env.HOSTNAME ? env.HOSTNAME : "localhost"],
+			allowedHosts: [env.PUBLIC_HOSTNAME || "localhost"],
 			watch: {
 				usePolling: true,
 			}

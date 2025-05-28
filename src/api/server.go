@@ -62,10 +62,15 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	// allowedOrigins := []string{
+	// 	"https://mashboard.app",
+	// 	"https://50.116.53.73:4173",
+	// 	"https://50.116.53.73:3030",
+	// }
 	allowedOrigins := []string{
-		"https://mashboard.app",
-		"https://50.116.53.73:4173",
-		"https://50.116.53.73:3030",
+		"http://127.0.0.1",
+		"http://127.0.0.1:4173",
+		"http://127.0.0.1:3030",
 	}
 	allowedOriginsStr := strings.Join(allowedOrigins, ", ")
 
