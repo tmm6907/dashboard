@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-
-	"github.com/tmm6907/dashboard/utils"
 )
 
 func ExtractChannelID(youtubeURL string) (string, error) {
@@ -56,7 +54,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 	customRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/c/[a-zA-Z0-9_-]+`)
 	channelIDRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:www\.)?youtube\.com/channel/([A-Za-z0-9_-]+)`)
 	userRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/user/[a-zA-Z0-9_-]+`)
-	apiKeyBytes, err := utils.ReadDockerSecret("youtube_api_key")
+	apiKeyBytes, err := ReadDockerSecret("youtube_api_key")
 	if err != nil {
 		return "", err
 	}
