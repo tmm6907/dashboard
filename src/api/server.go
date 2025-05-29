@@ -125,8 +125,8 @@ func main() {
 	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
 	feedItemRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeedItems)
 	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
+	feedItemRoutes.Post("/save/:id/", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
 	feedItemRoutes.Get("/:id", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItem)
-	feedItemRoutes.Post("/:id/bookmark", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
 
 	userRoutes := apiRoutes.Group("/user")
 	userRoutes.Get("/", routesHandler.GetUser)

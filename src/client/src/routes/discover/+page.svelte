@@ -24,7 +24,7 @@
 
     onMount(async () => {
         console.log("loaded");
-        await getDiscoveryItems();
+        // await getDiscoveryItems();
     });
 </script>
 

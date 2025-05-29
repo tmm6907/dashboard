@@ -47,7 +47,7 @@
         }
         try {
             let response = await fetch(
-                `https://api.mashboard.app/api/feeds/items/${item.id}/bookmark`,
+                `https://api.mashboard.app/api/feeds/items/save/${item.id}`,
                 {
                     method: "POST",
                     credentials: "include",
