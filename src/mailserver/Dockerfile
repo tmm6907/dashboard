@@ -37,10 +37,9 @@ COPY start.sh /mail/start.sh
 COPY ./build.sql /mail/build.sql
 COPY --from=build /tmp/mail /mail/mailserver
 
+RUN chmod 644 /etc/postfix/main.cf
 RUN chmod +x /mail/start.sh
-EXPOSE 25 8888
 
-# Optional: set the hostname inside the container at runtime, if needed
-# but you can also set this in docker-compose.yml as hostname: mashboard.app
+EXPOSE 25 8888
 
 ENTRYPOINT ["/mail/start.sh"]
