@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tmm6907/dashboard/routes"
 	"github.com/tmm6907/dashboard/utils"
@@ -52,23 +51,11 @@ func initDB() (*sqlx.DB, error) {
 }
 
 func main() {
-	err := godotenv.Load()
-	var allowedOrigins []string
-	if err != nil {
-		log.Error(err)
-		allowedOrigins = []string{
-			"https://mashboard.app",
-			"https://50.116.53.73:4173",
-			"https://50.116.53.73:3030",
-		}
-	} else {
-		allowedOrigins = []string{
-			"http://127.0.0.1",
-			"http://127.0.0.1:4173",
-			"http://127.0.0.1:3030",
-		}
+	allowedOrigins := []string{
+		"https://mashboard.app",
+		"https://50.116.53.73:4173",
+		"https://50.116.53.73:3030",
 	}
-
 	server := fiber.New()
 	db, err := initDB()
 	if err != nil {
@@ -162,7 +149,7 @@ func main() {
 	})
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		log.Error("port not configured")
 	}
 	host := fmt.Sprintf(":%s", port)
 	go workerHandler.StartRSSFetcher(nil)
