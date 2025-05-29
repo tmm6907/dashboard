@@ -70,6 +70,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+
 		data := make(map[string]any)
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
@@ -79,7 +80,14 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-
+		if res.StatusCode == 400 {
+			resErr, ok := data["error"]
+			if !ok {
+				return "", errors.New("expected 400 error message from youtube api")
+			}
+			err = errors.New(resErr.(string))
+			return "", err
+		}
 		dataItems, ok := data["items"]
 		if !ok {
 			return "", fmt.Errorf("No results found for channel %s, %v", identifier, data)
