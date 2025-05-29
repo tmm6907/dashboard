@@ -38,8 +38,8 @@ COPY ./build.sql /mail/build.sql
 COPY --from=build /tmp/mail /mail/mailserver
 
 RUN chmod 644 /etc/postfix/main.cf
-RUN chmod +x /mail/start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 25 8888
 
-ENTRYPOINT ["/mail/start.sh"]
+ENTRYPOINT ["/start.sh"]
