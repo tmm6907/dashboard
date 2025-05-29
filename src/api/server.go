@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tmm6907/dashboard/routes"
+	"github.com/tmm6907/dashboard/utils"
 	"github.com/tmm6907/dashboard/worker"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -92,19 +93,30 @@ func main() {
 		return c.Next()
 	})
 
-	client_id := os.Getenv("GOOGLE_CLIENT_ID")
+	client_id, err := utils.ReadDockerSecret("google_client_id")
+	if err != nil {
+		log.Fatalf("Error reading google_client_id secret: %v", err)
+	}
+	// Trim whitespace if necessary, as secrets can have newlines
+	client_id = strings.TrimSpace(client_id)
 	if client_id == "" {
-		log.Fatal("Missing google client id")
+		log.Fatal("Google client ID secret is empty")
 	}
 
-	client_secret := os.Getenv("GOOGLE_CLIENT_SECRET")
+	// Read GOOGLE_CLIENT_SECRET from Docker secret
+	client_secret, err := utils.ReadDockerSecret("google_client_secret")
+	if err != nil {
+		log.Fatalf("Error reading google_client_secret secret: %v", err)
+	}
+	// Trim whitespace if necessary
+	client_secret = strings.TrimSpace(client_secret)
 	if client_secret == "" {
-		log.Fatal("Missing google client secret")
+		log.Fatal("Google client secret secret is empty")
 	}
 
 	var GoogleOAuthConfig = &oauth2.Config{
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		ClientID:     client_id,
+		ClientSecret: client_secret,
 		RedirectURL:  "https://api.mashboard.app/auth/callback",
 		Scopes:       []string{"profile", "email"},
 		Endpoint:     google.Endpoint,

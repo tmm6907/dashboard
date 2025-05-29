@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/tmm6907/dashboard/auth"
 	"github.com/tmm6907/dashboard/models"
+	"github.com/tmm6907/dashboard/utils"
 	"golang.org/x/oauth2"
 )
 
@@ -100,14 +100,22 @@ func (h *Handler) FetchGoogleInfo(code string) (map[string]string, error) {
 }
 
 func (h *Handler) ParseTokenString(tokenString string) (*jwt.Token, error) {
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret, err := utils.ReadDockerSecret("jwt_secret")
+	if err != nil {
+		log.Fatalf("Error reading jwt_secret secret: %v", err)
+	}
+	jwtSecret = strings.TrimSpace(jwtSecret)
 	return jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return []byte(jwtSecret), nil
 	})
 }
 
 func (h *Handler) ParseExpiredTokenString(tokenString string) (*jwt.Token, error) {
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret, err := utils.ReadDockerSecret("jwt_secret")
+	if err != nil {
+		log.Fatalf("Error reading jwt_secret secret: %v", err)
+	}
+	jwtSecret = strings.TrimSpace(jwtSecret)
 	parser := jwt.NewParser(jwt.WithoutClaimsValidation())
 	return parser.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return []byte(jwtSecret), nil
@@ -175,7 +183,11 @@ func (h *Handler) GenerateJWTToken(oauthID string, fname string, lname string, a
 		"exp":        time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
 		"iat":        time.Now().Unix(),                     // Issued at
 	}
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret, err := utils.ReadDockerSecret("jwt_secret")
+	if err != nil {
+		log.Fatalf("Error reading jwt_secret secret: %v", err)
+	}
+	jwtSecret = strings.TrimSpace(jwtSecret)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(jwtSecret))
 }
