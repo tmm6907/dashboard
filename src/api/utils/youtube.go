@@ -65,7 +65,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 		//https://www.googleapis.com/youtube/v3/channels?part=id&forUsername=@LegalEagle&key=
 		identifier := handleRegex.FindStringSubmatch(channelURL)[1]
 		log.Println("identifier", identifier)
-		url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=@%s&key=%s", identifier, apiKey)
+		url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/channels?part=id,snippet,contentDetails,statistics&forHandle=@%s&key=%s", identifier, apiKey)
 		res, err := http.Get(url)
 		if err != nil {
 			return "", err
