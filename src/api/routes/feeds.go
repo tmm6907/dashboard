@@ -162,6 +162,15 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 	if feedData.Link == "" {
 		return c.Status(fiber.StatusBadRequest).SendString("url must not be empty")
 	}
+
+	if utils.IsYoutubeChannelURL(feedData.Link) {
+		link, err := utils.GetYouTubeRSS(feedData.Link)
+		if err != nil {
+			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		feedData.Link = link
+	}
 	db := h.GetDB()
 	var feed models.Feed
 	if err = db.Get(&feed, "SELECT * FROM feeds WHERE link = ?;", feedData.Link); err != nil {
