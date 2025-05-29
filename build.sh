@@ -46,15 +46,3 @@ log_info "$CADDY_IMAGE built successfully."
 log_info "All Docker images built and tagged for local use!"
 
 ---
-
-### How to Use This Script:
-
-1.  **Save:** Save the content above into a file named `build_local_images.sh` in the root directory of your project (where your `docker-compose.yml` is).
-2.  **Make Executable:** `chmod +x build_local_images.sh`
-3.  **Run:** `./build_local_images.sh`
-
-This script will:
-* Build each of your service images.
-* Tag them with `:local` (e.g., `mashboard-server:local`), indicating they are for local use and not intended for a registry.
-
-After running this, your images will be available in your local Docker cache, ready for `docker stack deploy` (if you update your `docker-compose.yml` to use the `image:` key with these local tags) or `docker compose up` for development.
