@@ -18,7 +18,7 @@ import (
 )
 
 func initDB() (*sqlx.DB, error) {
-	dbName := "/data/db/mashboard.sqlite"
+	dbName := "/data/mashboard.sqlite"
 	buildFile := "build.sql"
 	pragmaCommands := []string{
 		"PRAGMA load_extension = 1;",
