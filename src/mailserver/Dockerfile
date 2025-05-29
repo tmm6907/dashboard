@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /mail
 
 COPY postfix/main.cf /etc/postfix/main.cf
-COPY start.sh /mail/start.sh
+COPY start.sh /start.sh
 COPY ./build.sql /mail/build.sql
 COPY --from=build /tmp/mail /mail/mailserver
 
