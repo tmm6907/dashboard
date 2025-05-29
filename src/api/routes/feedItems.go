@@ -215,7 +215,7 @@ func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
     WHERE fi.id = ?;`, user.ID, feedItemID)
 
 	if err := row.MapScan(feedItem); err != nil {
-		log.Error(err)
+		log.Error("issue again", c.Request().URI().FullURI(), err)
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.JSON(feedItem)
