@@ -101,6 +101,97 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 	})
 }
 
+func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
+	var feedItems []map[string]any
+	db := h.GetDB()
+	token := c.Cookies("token")
+	if token == "" {
+		log.Error("token should not be empty")
+		return c.SendStatus(http.StatusInternalServerError)
+	}
+	user, err := h.GetUserFromToken(token)
+	if err != nil {
+		log.Error(err)
+		return c.SendStatus(http.StatusUnauthorized)
+	}
+	category := strings.ToLower(c.Query("category"))
+	if category != "" && category != "all" && category != "all categories" {
+		if category == "technology" {
+			category = "tech"
+		}
+		err = h.QueryRows(&feedItems, `
+		SELECT fi.*, f.title as feed_name 
+		FROM feed_items fi 
+		JOIN feeds f ON fi.feed_id = f.feed_id
+		JOIN feed_follows ff ON ff.feed_id = fi.feed_id
+		WHERE ff.user_id = ?
+		AND (categories LIKE ? OR media_type LIKE ?)
+		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`, user.ID, "%"+category+"%", "%"+category+"%")
+		if err != nil {
+			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	} else {
+		err = h.QueryRows(&feedItems, `
+		SELECT fi.*, f.title as feed_name 
+		FROM feed_items fi 
+		JOIN feeds f ON fi.feed_id = f.feed_id
+		JOIN feed_follows ff ON ff.feed_id = fi.feed_id
+		WHERE ff.user_id = ?
+		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`)
+		if err != nil {
+			log.Error(err)
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	}
+
+	sort.Slice(feedItems, func(i, j int) bool {
+		iDateStr := feedItems[i]["pub_date"].(string)
+		iPubdate, _ := utils.ParseTimeStr(iDateStr)
+		jDateStr := feedItems[i]["pub_date"].(string)
+		jPubDate, _ := utils.ParseTimeStr(jDateStr)
+		return iPubdate.After(jPubDate)
+	})
+
+	latest := []map[string]any{}
+	// var saved []models.FeedItem
+	var collections []models.Collection
+
+	// if err = db.Select(&saved, `
+	// 		SELECT fi.*
+	// 		FROM feed_items fi
+	// 		JOIN saved_feeds sf ON fi.id = sf.feed_item_id
+	// 		WHERE sf.user_id = ?;`, userID); err != nil {
+	// 	log.Error(err)
+	// 	return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	// }
+
+	if err = db.Select(&collections, `
+			SELECT c.*
+			FROM collections c
+			JOIN user_collections uc ON c.id = uc.collection_id
+			WHERE uc.user_id = ?;`, user.ID); err != nil {
+		log.Error(err)
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+	for _, item := range feedItems {
+		dateStr := item["pub_date"].(string)
+		pubDate, err := utils.ParseTimeStr(dateStr)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		if time.Now().Sub(pubDate) <= 72*time.Hour {
+			latest = append(latest, item)
+		}
+	}
+	return c.JSON(map[string]any{
+		"latest":      latest,    //last 3 days
+		"items":       feedItems, //last 7 days
+		"collections": collections,
+	})
+
+}
+
 func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
 	token := c.Cookies("token")
 	feedItemID := c.Params("id")

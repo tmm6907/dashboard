@@ -6,22 +6,22 @@
     let feeds = $state([]); // Store fetched feeds
     let loading = $state(false); // Track loading
 
-    async function fetchFeeds() {
+    async function fetchFeeds(offset) {
+        offset = offset || 25;
         loading = true;
         try {
             const response = await fetch(
-                `https://api.mashboard.app/api/feeds/`,
+                `https://api.mashboard.app/api/feeds/followed`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ url: feedQuery }),
+                    body: JSON.stringify({ url: feedQuery, offset: offset }),
                     credentials: "include",
                 },
             );
             if (response.status == 401) {
                 triggerAlert("Not logged in", {
                     type: "alert-error",
-                    duration: 3000,
                     closable: true,
                 });
                 return;

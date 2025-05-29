@@ -54,7 +54,7 @@
         class="text-base-content min-w-[32ch] max-w-[48ch]"
         onclick={goToFeedItem}
     >
-        <div class="bg-base-300">
+        <div class="bg-base-300 rounded-lg">
             <img
                 src={item.image
                     ? item.image

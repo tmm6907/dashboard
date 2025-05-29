@@ -35,63 +35,6 @@ func (h *Handler) GetFeeds(c *fiber.Ctx) error {
 	})
 }
 
-// func (h *Handler) GetFeedData(c *fiber.Ctx) error {
-// 	// db := h.GetDB()
-// 	request := make(map[string]any)
-// 	resultData := struct {
-// 		Link        string `json:"link"`
-// 		Title       string `json:"title"`
-// 		Description string `json:"description"`
-// 		Image       string `json:"image"`
-// 		Language    string `json:"language"`
-// 	}{}
-// 	if err := json.Unmarshal(c.Body(), &request); err != nil {
-// 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-// 	}
-
-// 	link, ok := request["link"]
-// 	if !ok {
-// 		return c.Status(http.StatusBadRequest).SendString("link is required")
-// 	}
-// 	resultData.Link = link.(string)
-// 	title, ok := request["title"]
-// 	if !ok {
-// 		return c.Status(http.StatusBadRequest).SendString("title is required")
-// 	}
-// 	resultData.Title = title.(string)
-
-// 	description, ok := request["description"]
-// 	if !ok {
-// 		description = ""
-// 	}
-// 	resultData.Description = description.(string)
-// 	language, ok := request["language"]
-// 	if !ok {
-// 		language = ""
-// 	}
-// 	resultData.Language = language.(string)
-
-// 	// isYoutube := false
-// 	log.Debug("Feed link before youtube check", resultData.Link)
-// 	if utils.IsYoutubeChannelURL(resultData.Link) {
-// 		// isYoutube = true
-// 		link, err := utils.GetYouTubeRSS(resultData.Link)
-// 		if err != nil {
-// 			log.Error(err, link)
-// 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-// 		}
-// 		resultData.Link = link
-// 	}
-// 	log.Debug("Feed link after youtube check", resultData.Link)
-
-// 	if !h.ValidateURL(resultData.Link) {
-// 		log.Error("Invalid feed url", resultData.Link)
-// 		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
-// 	}
-
-// 	return c.JSON(resultData)
-// }
-
 // func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 // 	db := h.GetDB()
 // 	request := make(map[string]any)
@@ -260,4 +203,37 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 		}
 	}
 	return c.SendStatus(http.StatusOK)
+}
+
+func (h *Handler) GetFollowedFeeds(c *fiber.Ctx) error {
+	var feeds []models.Feed
+	db := h.GetDB()
+	body := struct {
+		Query string `json:"query"`
+	}{}
+	if err := c.BodyParser(&body); err != nil {
+		return c.SendStatus(500)
+	}
+	token := c.Cookies("token")
+	if token == "" {
+		return c.Status(fiber.StatusInternalServerError).SendString("auth token empty")
+	}
+	user, err := h.GetUserFromToken(token)
+	if err != nil {
+		log.Error(err)
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if body.Query == "" {
+		if err := db.Select(&feeds, "SELECT * FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? ORDER BY title;", user.ID); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	} else {
+		param := "%" + body.Query + "%"
+		if err := db.Select(&feeds, "SELECT * FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? AND (title LIKE ? OR link LIKE ? OR categories LIKE ?) ORDER BY title;", user.ID, param, param, param); err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+	}
+	return c.JSON(map[string]any{
+		"feeds": feeds,
+	})
 }

@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
-	console.log(env.PUBLIC_HOSTNAME)
+	console.log("Hostname: ", env.PUBLIC_HOSTNAME)
 	return {
 		plugins: [
 			sveltekit(),
@@ -39,9 +39,9 @@ export default defineConfig(({ mode }) => {
 		server: {
 			host: "0.0.0.0",
 			port: 3030,
-			allowedHosts: [env.PUBLIC_HOSTNAME || "mashboard.app"],
+			allowedHosts: [env.PUBLIC_HOSTNAME || "localhost"],
 			watch: {
-				usePolling: true,
+				usePolling: mode === "development",
 			}
 		},
 	}
