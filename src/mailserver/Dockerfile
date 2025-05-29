@@ -23,6 +23,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 FROM debian:bookworm-slim AS final
 
 RUN apt-get update && apt-get install -y \
+    postfix \
     ca-certificates \
     tzdata \
     sqlite3 \
@@ -30,11 +31,16 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mail
+
+COPY postfix/main.cf /etc/postfix/main.cf
+COPY start.sh /mail/start.sh
 COPY ./build.sql /mail/build.sql
-
-
 COPY --from=build /tmp/mail /mail/mailserver
 
+RUN chmod +x /mail/start.sh
 EXPOSE 25 8888
 
-ENTRYPOINT ["/mail/mailserver"]
+# Optional: set the hostname inside the container at runtime, if needed
+# but you can also set this in docker-compose.yml as hostname: mashboard.app
+
+ENTRYPOINT ["/mail/start.sh"]

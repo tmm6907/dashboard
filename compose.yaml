@@ -38,6 +38,7 @@ services:
     build:
       context: src/mailserver
       dockerfile: Dockerfile
+    hostname: mashboard.app
     ports:
       - "25:25"
       - "8888:8888"
