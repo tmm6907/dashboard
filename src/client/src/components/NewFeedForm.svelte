@@ -79,6 +79,9 @@
                 window.location.href = "/";
             }
             let err = await resp.text();
+            triggerAlert("Failed to follow " + formData.get("title"), {
+                type: "alert-error",
+            });
             throw new Error(err);
         });
     }

@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,66 +35,123 @@ func (h *Handler) GetFeeds(c *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) CreateFeed(c *fiber.Ctx) error {
-	db := h.GetDB()
-	request := make(map[string]any)
-	if err := json.Unmarshal(c.Body(), &request); err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
+// func (h *Handler) GetFeedData(c *fiber.Ctx) error {
+// 	// db := h.GetDB()
+// 	request := make(map[string]any)
+// 	resultData := struct {
+// 		Link        string `json:"link"`
+// 		Title       string `json:"title"`
+// 		Description string `json:"description"`
+// 		Image       string `json:"image"`
+// 		Language    string `json:"language"`
+// 	}{}
+// 	if err := json.Unmarshal(c.Body(), &request); err != nil {
+// 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 	}
 
-	link, ok := request["link"]
-	if !ok {
-		return c.Status(http.StatusBadRequest).SendString("link is required")
-	}
-	title, ok := request["title"]
-	if !ok {
-		return c.Status(http.StatusBadRequest).SendString("title is required")
-	}
-	feedLink := link.(string)
+// 	link, ok := request["link"]
+// 	if !ok {
+// 		return c.Status(http.StatusBadRequest).SendString("link is required")
+// 	}
+// 	resultData.Link = link.(string)
+// 	title, ok := request["title"]
+// 	if !ok {
+// 		return c.Status(http.StatusBadRequest).SendString("title is required")
+// 	}
+// 	resultData.Title = title.(string)
 
-	isYoutube := false
-	log.Debug("Feed link before youtube check", feedLink)
-	if utils.IsYoutubeChannelURL(feedLink) {
-		isYoutube = true
-		link, err := utils.GetYouTubeRSS(feedLink)
-		if err != nil {
-			log.Error(err, link)
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-		feedLink = link
-	}
-	log.Debug("Feed link after youtube check", feedLink)
+// 	description, ok := request["description"]
+// 	if !ok {
+// 		description = ""
+// 	}
+// 	resultData.Description = description.(string)
+// 	language, ok := request["language"]
+// 	if !ok {
+// 		language = ""
+// 	}
+// 	resultData.Language = language.(string)
 
-	if !h.ValidateURL(feedLink) {
-		log.Error("Invalid feed url", feedLink)
-		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
-	}
+// 	// isYoutube := false
+// 	log.Debug("Feed link before youtube check", resultData.Link)
+// 	if utils.IsYoutubeChannelURL(resultData.Link) {
+// 		// isYoutube = true
+// 		link, err := utils.GetYouTubeRSS(resultData.Link)
+// 		if err != nil {
+// 			log.Error(err, link)
+// 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 		}
+// 		resultData.Link = link
+// 	}
+// 	log.Debug("Feed link after youtube check", resultData.Link)
 
-	description, ok := request["description"]
-	if !ok {
-		description = ""
-	}
-	language, ok := request["language"]
-	if !ok {
-		language = ""
-	}
+// 	if !h.ValidateURL(resultData.Link) {
+// 		log.Error("Invalid feed url", resultData.Link)
+// 		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
+// 	}
 
-	feedUUID := uuid.New()
-	feedID := feedUUID[:]
-	if isYoutube {
-		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language, categories, media_type) VALUES (?, ?, ?, ?, ?, ?, ?);",
-			feedID, title, feedLink, description, language, "youtube", "video"); err != nil {
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-	} else {
-		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
-			feedID, title, feedLink, description, language); err != nil {
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-	}
+// 	return c.JSON(resultData)
+// }
 
-	return nil
-}
+// func (h *Handler) CreateFeed(c *fiber.Ctx) error {
+// 	db := h.GetDB()
+// 	request := make(map[string]any)
+// 	if err := json.Unmarshal(c.Body(), &request); err != nil {
+// 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 	}
+
+// 	link, ok := request["link"]
+// 	if !ok {
+// 		return c.Status(http.StatusBadRequest).SendString("link is required")
+// 	}
+// 	title, ok := request["title"]
+// 	if !ok {
+// 		return c.Status(http.StatusBadRequest).SendString("title is required")
+// 	}
+// 	feedLink := link.(string)
+
+// 	isYoutube := false
+// 	log.Debug("Feed link before youtube check", feedLink)
+// 	if utils.IsYoutubeChannelURL(feedLink) {
+// 		isYoutube = true
+// 		link, err := utils.GetYouTubeRSS(feedLink)
+// 		if err != nil {
+// 			log.Error(err, link)
+// 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 		}
+// 		feedLink = link
+// 	}
+// 	log.Debug("Feed link after youtube check", feedLink)
+
+// 	if !h.ValidateURL(feedLink) {
+// 		log.Error("Invalid feed url", feedLink)
+// 		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
+// 	}
+
+// 	description, ok := request["description"]
+// 	if !ok {
+// 		description = ""
+// 	}
+// 	language, ok := request["language"]
+// 	if !ok {
+// 		language = ""
+// 	}
+
+// 	feedUUID := uuid.New()
+// 	feedID := feedUUID[:]
+// 	if isYoutube {
+// 		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language, categories, media_type) VALUES (?, ?, ?, ?, ?, ?, ?);",
+// 			feedID, title, feedLink, description, language, "youtube", "video"); err != nil {
+// 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 		}
+// 	} else {
+// 		if _, err := db.Exec("INSERT INTO feeds(feed_id, title, link, description, language) VALUES (?, ?, ?, ?, ?);",
+// 			feedID, title, feedLink, description, language); err != nil {
+// 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+// 		}
+// 	}
+
+// 	return nil
+// }
 
 func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 	body := struct {
@@ -106,8 +162,15 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 	}
 
 	if body.URL != "" {
+		if utils.IsYoutubeChannelURL(body.URL) {
+			link, err := utils.GetYouTubeRSS(body.URL)
+			if err != nil {
+				log.Error(err, link)
+				return c.Status(http.StatusInternalServerError).SendString(err.Error())
+			}
+			body.URL = link
+		}
 		rssParser := gofeed.NewParser()
-
 		feedData, err := rssParser.ParseURL(body.URL)
 		if err != nil {
 			log.Error(err)
