@@ -39,7 +39,7 @@ func ExtractChannelID(youtubeURL string) (string, error) {
 }
 
 func IsYoutubeChannelURL(url string) bool {
-	return strings.Contains(url, "www.youtube.com")
+	return strings.Contains(url, "youtube.com")
 }
 
 func getFeedFromChannelID(channelID string) string {
