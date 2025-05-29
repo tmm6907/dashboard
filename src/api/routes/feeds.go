@@ -221,6 +221,7 @@ func (h *Handler) GetFollowedFeeds(c *fiber.Ctx) error {
 		Query string `json:"query"`
 	}{}
 	if err := c.BodyParser(&body); err != nil {
+		log.Error(err)
 		return c.SendStatus(500)
 	}
 	token := c.Cookies("token")

@@ -140,7 +140,7 @@ func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 		WHERE ff.user_id = ?
 		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`, user.ID)
 		if err != nil {
-			log.Error(err)
+			log.Error("Failed to retrieve followed feed items", err)
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	}
