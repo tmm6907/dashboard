@@ -44,5 +44,3 @@ docker build -t "$CADDY_IMAGE" -f Dockerfile . || { log_error "Failed to build $
 log_info "$CADDY_IMAGE built successfully."
 
 log_info "All Docker images built and tagged for local use!"
-
----
