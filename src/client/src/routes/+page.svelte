@@ -18,25 +18,7 @@
         feedState.feedLatest = sortFeedItems(results.latest);
     }
 
-    const authenticateUser = async () => {
-        let resp = await fetch("https://api.mashboard.app/auth/login");
-        if (!resp) {
-            console.error("failed to authenticate");
-            throw Error("failed to authenticate");
-        }
-        if (!resp.ok) {
-            console.error("failed to authenticate:", resp.status);
-            throw new Error("failed to authenticate");
-        }
-    };
-
     $effect(async () => {
-        try {
-            await authenticateUser();
-        } catch (e) {
-            console.error(e);
-            triggerAlert({ e, type: "alert-error" });
-        }
         await updateFeed();
     });
     onMount(async () => {

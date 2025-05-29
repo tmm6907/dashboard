@@ -16,8 +16,7 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
         const response = await fetch("https://api.mashboard.app/api/feeds/items/followed?category=" + category, {
             credentials: "include",
         });
-
-        if (response.status == 302) {
+        if (response.status == 401) {
             triggerAlert("Not logged in", {
                 type: "alert-error",
                 duration: 3000,
