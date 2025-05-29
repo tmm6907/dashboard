@@ -120,7 +120,7 @@ func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 			category = "tech"
 		}
 		err = h.QueryRows(&feedItems, `
-		SELECT fi.*, f.title as feed_name 
+		SELECT fi.*, ff.user_feed_name as feed_name 
 		FROM feed_items fi 
 		JOIN feeds f ON fi.feed_id = f.feed_id
 		JOIN feed_follows ff ON ff.feed_id = fi.feed_id
@@ -133,12 +133,12 @@ func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 		}
 	} else {
 		err = h.QueryRows(&feedItems, `
-		SELECT fi.*, f.title as feed_name 
+		SELECT fi.*, ff.user_feed_name as feed_name 
 		FROM feed_items fi 
 		JOIN feeds f ON fi.feed_id = f.feed_id
 		JOIN feed_follows ff ON ff.feed_id = fi.feed_id
 		WHERE ff.user_id = ?
-		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`)
+		AND datetime(fi.pub_date) >= datetime('now', '-7 days');`, user.ID)
 		if err != nil {
 			log.Error(err)
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
@@ -195,7 +195,7 @@ func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
 	token := c.Cookies("token")
 	feedItemID := c.Params("id")
-	feedItem := make(map[string]interface{})
+	feedItem := make(map[string]any)
 	user, err := h.GetUserFromToken(token)
 	if err != nil {
 		c.Status(http.StatusInternalServerError).SendString(err.Error())
