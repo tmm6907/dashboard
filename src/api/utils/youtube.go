@@ -55,7 +55,11 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 	customRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/c/[a-zA-Z0-9_-]+`)
 	channelIDRegex := regexp.MustCompile(`(?i)(?:https?://)?(?:www\.)?youtube\.com/channel/([A-Za-z0-9_-]+)`)
 	userRegex := regexp.MustCompile(`(?i)(?:https?://)?(www\.)?youtube\.com/user/[a-zA-Z0-9_-]+`)
-	apiKey := os.Getenv("YOUTUBE_API_KEY")
+	apiKeyBytes, err := os.ReadFile("/run/secrets/youtube_api_key")
+	if err != nil {
+		return "", err
+	}
+	apiKey := strings.TrimSpace(string(apiKeyBytes))
 	if apiKey == "" {
 		return "", errors.New("missing api key")
 	}

@@ -18,7 +18,6 @@ RUN apk add nss-tools
 # Copy the Caddy binary from the build stage
 COPY --from=build /build/caddy /usr/bin/caddy
 
-
 # Set a volume for persistent data storage
 VOLUME ["/data"]
 

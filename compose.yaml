@@ -5,39 +5,36 @@ networks:
 
 services:
   server:
-    build:
-      context: src/api
-      dockerfile: Dockerfile
+    image: mashboard-server:local
     environment:
       - PORT=8080
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    secrets:
+      - youtube_api_key
+      - google_client_id
+      - google_client_secret
+      - jwt_secret
     volumes:
       - api_db:/root/db
     networks:
       - internal
 
   client:
-    build:
-      context: src/client
-      dockerfile: Dockerfile
-    container_name: client-server
+    image: mashboard-client:local
     environment:
       - PORT=3030
-      - HOSTNAME=mashboard.app
-    env_file:
-      - .env
+      - PUBLIC_HOSTNAME=mashboard.app
+      - PUBLIC_HOST_URL=https://mashboard.app
+      - PUBLIC_PORT=3030
+      - PUBLIC_API_BASE_URL=https://api.mashboard.app
     ports:
       - "3030:3030"
     networks:
       - client-server
 
   mail:
-    build:
-      context: src/mailserver
-      dockerfile: Dockerfile
+    image: mashboard-mail:local
     hostname: mashboard.app
     ports:
       - "25:25"
@@ -49,10 +46,7 @@ services:
       - internal
 
   caddy:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: caddy_server
+    image: mashboard-caddy:local
     ports:
       - "80:80"
       - "443:443"
@@ -64,10 +58,21 @@ services:
     depends_on:
       - server
       - mail
-    restart: unless-stopped
     networks:
       - internal
       - client-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+secrets:
+  youtube_api_key:
+    external: true
+  google_client_id:
+    external: true
+  google_client_secret:
+    external: true
+  jwt_secret:
+    external: true
 
 volumes:
   caddy_data:
