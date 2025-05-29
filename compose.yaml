@@ -16,7 +16,7 @@ services:
       - google_client_secret
       - jwt_secret
     volumes:
-      - api_db:/root
+      - api_db:/data
     networks:
       - internal
 
