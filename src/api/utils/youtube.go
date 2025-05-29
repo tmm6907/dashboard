@@ -85,7 +85,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 			if !ok {
 				return "", errors.New("expected 400 error message from youtube api")
 			}
-			err = errors.New(resErr.(string))
+			err = fmt.Errorf("%v", resErr)
 			return "", err
 		}
 		dataItems, ok := data["items"]
