@@ -87,7 +87,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 		if len(items) != 1 {
 			return "", fmt.Errorf("Unknown exception: %v", data)
 		}
-		item, ok := items[0].(map[string]interface{})
+		item, ok := items[0].(map[string]any)
 		if !ok {
 			return "", fmt.Errorf("Invalid response format: item is not a map, got %T", items[0])
 		}
