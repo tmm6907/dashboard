@@ -78,10 +78,11 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 			return "", err
 		}
 
-		items, ok := data["items"].([]interface{})
+		dataItems, ok := data["items"]
 		if !ok {
 			return "", fmt.Errorf("Invalid response format: items is not a list, got %T", data["items"])
 		}
+		items := dataItems.([]any)
 
 		if len(items) != 1 {
 			return "", fmt.Errorf("Unknown exception: %v", data)
