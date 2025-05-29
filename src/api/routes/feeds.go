@@ -233,12 +233,12 @@ func (h *Handler) GetFollowedFeeds(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	if body.Query == "" {
-		if err := db.Select(&feeds, "SELECT * FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? ORDER BY title;", user.ID); err != nil {
+		if err := db.Select(&feeds, "SELECT feeds.* FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? ORDER BY title;", user.ID); err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	} else {
 		param := "%" + body.Query + "%"
-		if err := db.Select(&feeds, "SELECT * FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? AND (title LIKE ? OR link LIKE ? OR categories LIKE ?) ORDER BY title;", user.ID, param, param, param); err != nil {
+		if err := db.Select(&feeds, "SELECT feeds.* FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? AND (title LIKE ? OR link LIKE ? OR categories LIKE ?) ORDER BY title;", user.ID, param, param, param); err != nil {
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 	}
