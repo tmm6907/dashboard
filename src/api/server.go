@@ -123,7 +123,7 @@ func main() {
 	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
 	feedRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeeds)
 	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
-	feedRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeedItems)
+	feedItemRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeedItems)
 	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
 	feedItemRoutes.Get("/:id", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItem)
 	feedItemRoutes.Post("/:id/bookmark", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
