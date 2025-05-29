@@ -1,5 +1,5 @@
 <script>
-    import { getTimeAgoAll } from "$lib";
+    import { getTimeAgoAll, triggerAlert } from "$lib";
     import { onMount } from "svelte";
 
     // @ts-ignore
@@ -70,14 +70,12 @@
             headers: { "Content-Type": "application/json" },
             body: body,
         }).then(async (resp) => {
-            if (resp.status == 302) {
-                console.log("redirect");
-                window.location.href = await resp.text();
-                return;
-            }
             if (resp.status == 200) {
                 let my_modal_2 = document.getElementById("my_modal_2");
                 my_modal_2.style.display = "none";
+                triggerAlert("Followed " + formData.get("title"), {
+                    type: "alert-success",
+                });
                 window.location.href = "/";
             }
             let err = await resp.text();
