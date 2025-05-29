@@ -82,7 +82,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 
 		dataItems, ok := data["items"]
 		if !ok {
-			return "", fmt.Errorf("No results found for channel %s", identifier)
+			return "", fmt.Errorf("No results found for channel %s, %v", identifier, data)
 		}
 		items := dataItems.([]any)
 

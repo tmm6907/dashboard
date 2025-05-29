@@ -165,7 +165,7 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 		if utils.IsYoutubeChannelURL(body.URL) {
 			link, err := utils.GetYouTubeRSS(body.URL)
 			if err != nil {
-				log.Error(err, body.URL)
+				log.Error(err)
 				return c.Status(http.StatusInternalServerError).SendString(err.Error())
 			}
 			body.URL = link
