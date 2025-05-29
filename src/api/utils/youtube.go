@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -63,6 +64,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 	case handleRegex.MatchString(channelURL):
 		//https://www.googleapis.com/youtube/v3/channels?part=id&forUsername=@LegalEagle&key=
 		identifier := handleRegex.FindStringSubmatch(channelURL)[1]
+		log.Println("identifier", identifier)
 		url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=@%s&key=%s", identifier, apiKey)
 		res, err := http.Get(url)
 		if err != nil {
@@ -80,7 +82,7 @@ func GetYouTubeRSS(channelURL string) (string, error) {
 
 		dataItems, ok := data["items"]
 		if !ok {
-			return "", fmt.Errorf("Invalid response format: items is not a list, got %T", data["items"])
+			return "", fmt.Errorf("Invalid response format: items is not a list, got %T", data)
 		}
 		items := dataItems.([]any)
 
