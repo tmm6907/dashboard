@@ -54,6 +54,7 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 	feedLink := link.(string)
 
 	isYoutube := false
+	log.Debug("Feed link before youtube check", feedLink)
 	if utils.IsYoutubeChannelURL(feedLink) {
 		isYoutube = true
 		link, err := utils.GetYouTubeRSS(feedLink)
@@ -63,8 +64,10 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 		}
 		feedLink = link
 	}
+	log.Debug("Feed link after youtube check", feedLink)
 
 	if !h.ValidateURL(feedLink) {
+		log.Error("Invalid feed url", feedLink)
 		return c.Status(http.StatusBadRequest).SendString("invalid RSS feed link")
 	}
 

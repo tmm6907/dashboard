@@ -98,12 +98,12 @@ func (h *Handler) FetchRSSFeed(feed models.Feed) error {
 			}
 		} else {
 			if feedItem.Image == "" && image != "" {
-				if _, err := db.Exec("UPDATE feed_items SET image = ?, alt_text WHERE id = ?", image, feedItem.ID); err != nil {
+				if _, err := db.Exec("UPDATE feed_items SET image = ?, alt_text WHERE id = ?;", image, feedItem.ID); err != nil {
 					return err
 				}
 			}
 			if feedItem.Categories == "" && categories != "" {
-				if _, err := db.Exec("UPDATE feed_items SET categories = ? WHERE id = ?", categories, feedItem.ID); err != nil {
+				if _, err := db.Exec("UPDATE feed_items SET categories = ? WHERE id = ?;", categories, feedItem.ID); err != nil {
 					return err
 				}
 			}
