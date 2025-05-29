@@ -58,6 +58,7 @@ func (h *Handler) CreateFeed(c *fiber.Ctx) error {
 		isYoutube = true
 		link, err := utils.GetYouTubeRSS(feedLink)
 		if err != nil {
+			log.Error(err, link)
 			return c.Status(http.StatusInternalServerError).SendString(err.Error())
 		}
 		feedLink = link
