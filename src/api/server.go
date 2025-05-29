@@ -122,7 +122,7 @@ func main() {
 	feedRoutes.Post("/follow", routesHandler.CheckAuthHandler(), routesHandler.FollowFeed)
 	feedRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeeds)
 	feedItemRoutes.Get("/", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItems)
-	feedItemRoutes.Post("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeedItems)
+	feedItemRoutes.Get("/followed", routesHandler.CheckAuthHandler(), routesHandler.GetFollowedFeedItems)
 	feedItemRoutes.Get("/saved", routesHandler.CheckAuthHandler(), routesHandler.GetSavedFeedItems)
 	feedItemRoutes.Post("/save/:id/", routesHandler.CheckAuthHandler(), routesHandler.SaveFeedItem)
 	feedItemRoutes.Get("/:id", routesHandler.CheckAuthHandler(), routesHandler.GetFeedItem)
