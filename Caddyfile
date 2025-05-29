@@ -10,13 +10,13 @@ mashboard.app {
 	}
 
 	handle /* {
-		reverse_proxy client-server:3030
+		reverse_proxy mystack_client:3030
 	}
 }
 
 api.mashboard.app {
 	handle /* {
-		reverse_proxy server:8080
+		reverse_proxy mystack_server:8080
 	}
 }
 
