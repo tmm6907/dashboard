@@ -61,7 +61,7 @@
                     : "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"}
                 alt={item.alt_text ? item.alt_text : "feed item"}
                 loading="lazy"
-                class="h-auto w-full object-contain aspect-video"
+                class="h-auto w-full object-contain aspect-video rounded-lg"
             />
         </div>
         <span class=" text-wrap line-clamp-2">{item.title}</span>

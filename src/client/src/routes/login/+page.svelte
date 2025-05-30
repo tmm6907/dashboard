@@ -1,4 +1,6 @@
-<div class="h-screen grid place-items-center bg-base-300 p-4">
+<div
+    class="h-screen grid col-span-1 gap-y-12 place-items-center bg-base-300 p-4"
+>
     <div>
         <h1 class="prose text-4xl text-center font-bold text-primary mb-8">
             Login

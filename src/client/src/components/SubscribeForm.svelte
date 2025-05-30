@@ -24,6 +24,7 @@
                     type: "alert-error",
                     closable: true,
                 });
+                window.location.href = "/login";
                 return;
             }
             console.log(response.status);
@@ -45,12 +46,57 @@
         window.location.href = "/new-feed";
     }
 
+    async function followFeed(feedID, feedName) {
+        try {
+            const response = await fetch(
+                `https://api.mashboard.app/api/feeds/follow`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ feedID: feedID }),
+                    credentials: "include",
+                },
+            );
+            if (response.status == 401) {
+                triggerAlert("Not logged in", {
+                    type: "alert-error",
+                    closable: true,
+                });
+                window.location.href = "/login";
+                return;
+            }
+            if (response.ok) {
+                triggerAlert(`Followed ${feedName}`, {
+                    type: "alert-error",
+                    closable: true,
+                });
+            }
+        } catch (err) {
+            console.error("Error fetching feeds:", err);
+        } finally {
+            loading = false;
+        }
+    }
+
     // Fetch whenever `feedName` changes
     $effect(() => {
         fetchFeeds();
     });
 
-    onMount(() => {});
+    onMount(() => {
+        const clickHandler = (ev: MouseEvent) => {
+            const target = ev.target as HTMLElement;
+            if (target && target.matches(".follow-btn")) {
+                followFeed(target.id, target.dataset.feedname);
+            }
+        };
+
+        document.addEventListener("click", clickHandler);
+
+        onDestroy(() => {
+            document.removeEventListener("click", clickHandler);
+        });
+    });
 </script>
 
 <div class="fixed bottom-0 left-0 w-full pointer-events-none">
@@ -87,12 +133,10 @@
                     </div>
                     <span>Create New Feed</span>
                 </button>
-                <div class="h-64 overflow-y-auto">
+                <div id="browse-feed-list" class="h-64 overflow-y-auto">
                     {#each feeds as feed}
                         <div
-                            id={feed.feedId}
-                            class="feed-row grid grid-cols-4 items-center border-base-300 cursor-pointer"
-                            style="gap:0.5em;"
+                            class="feed-row grid grid-cols-4 gap-y-1 items-center border-base-300 cursor-pointer"
                         >
                             <div class="col-span-1 items-center align-middle">
                                 <div class="w-fit m-auto">
@@ -108,7 +152,10 @@
                                 <span>{feed.title}</span>
                             </div>
                             <div class="flex justify-end pr-2">
-                                <button class="btn btn-sm btn-soft"
+                                <button
+                                    id={feed.feedId}
+                                    data-feedname={feed.title}
+                                    class="follow-btn btn btn-sm btn-soft"
                                     >Follow</button
                                 >
                             </div>

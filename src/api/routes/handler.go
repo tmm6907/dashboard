@@ -193,12 +193,14 @@ func (h *Handler) GenerateJWTToken(oauthID string, fname string, lname string, a
 }
 
 func (h *Handler) GetUserFromToken(tokenString string) (*models.User, error) {
+	if tokenString == "" {
+		return nil, errors.New("auth token is empty")
+	}
 	token, err := h.ParseTokenString(tokenString)
 	if err != nil {
 		log.Error(err, tokenString)
 		return nil, err
 	}
-	// log.Debug(token)
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		oauthID, exists := claims["user_id"].(string)

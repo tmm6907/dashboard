@@ -15,15 +15,8 @@ import (
 func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 	feedItems := []map[string]any{}
 	db := h.GetDB()
-	token := c.Cookies("token")
-	if token == "" {
-		log.Error("token should not be empty")
-		return c.SendStatus(http.StatusInternalServerError)
-	}
-	log.Info(token)
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
-		log.Error(err)
 		return c.SendStatus(http.StatusUnauthorized)
 	}
 	userID := user.ID
@@ -104,14 +97,8 @@ func (h *Handler) GetFeedItems(c *fiber.Ctx) error {
 func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 	var feedItems []map[string]any
 	db := h.GetDB()
-	token := c.Cookies("token")
-	if token == "" {
-		log.Error("token should not be empty")
-		return c.SendStatus(http.StatusInternalServerError)
-	}
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
-		log.Error(err)
 		return c.SendStatus(http.StatusUnauthorized)
 	}
 	category := strings.ToLower(c.Query("category"))
@@ -193,12 +180,11 @@ func (h *Handler) GetFollowedFeedItems(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
-	token := c.Cookies("token")
 	feedItemID := c.Params("id")
 	feedItem := make(map[string]any)
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
-		c.Status(http.StatusInternalServerError).SendString(err.Error())
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 
 	db := h.GetDB()
@@ -222,14 +208,9 @@ func (h *Handler) GetFeedItem(c *fiber.Ctx) error {
 }
 
 func (h *Handler) SaveFeedItem(c *fiber.Ctx) error {
-	token := c.Cookies("token")
-	if token == "" {
-		return c.Status(http.StatusInternalServerError).SendString("expected auth token")
-	}
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString("unable to determine user id")
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 	feedItemID := c.Params("id")
 
@@ -250,14 +231,9 @@ func (h *Handler) SaveFeedItem(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetSavedFeedItems(c *fiber.Ctx) error {
-	token := c.Cookies("token")
-	if token == "" {
-		return c.Status(http.StatusInternalServerError).SendString("expected auth token")
-	}
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
-		log.Error(err)
-		return c.Status(http.StatusInternalServerError).SendString("unable to determine user id")
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 	items := []map[string]any{}
 	err = h.QueryRows(&items, "SELECT fi.*, f.title as feed_name FROM feed_items fi JOIN saved_feeds sf ON fi.id = sf.feed_item_id LEFT JOIN feeds f ON fi.feed_id = f.feed_id WHERE sf.user_id = ?;", user.ID)

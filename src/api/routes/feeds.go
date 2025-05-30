@@ -148,14 +148,36 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 }
 
 func (h *Handler) FollowFeed(c *fiber.Ctx) error {
-	token := c.Cookies("token")
-	if token == "" {
-		return c.Status(fiber.StatusInternalServerError).SendString("auth token empty")
-	}
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
+		return c.SendStatus(http.StatusUnauthorized)
+	}
+	feedData := struct {
+		FeedID string `json:"feedID"`
+	}{}
+	if err = c.BodyParser(&feedData); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	var feed *models.Feed
+	db := h.GetDB()
+	u, _ := uuid.Parse(feedData.FeedID)
+	b2 := u[:]
+	feedUUID := utils.UUID(b2)
+	if err = db.Get(&feed, "SELECT * FROM feeds WHERE feed_id = ?;", feedUUID); err != nil {
 		log.Error(err)
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(http.StatusInternalServerError).SendString("feed not found")
+	}
+	if _, err = db.Exec("INSERT INTO feed_follows (user_id, feed_id) VALUES (?, ?);", user.ID, feedUUID); err != nil {
+		log.Error(err)
+		return c.Status(http.StatusInternalServerError).SendString("failed to follow feed")
+	}
+	return nil
+}
+
+func (h *Handler) CreateAndFollowFeed(c *fiber.Ctx) error {
+	user, err := h.GetUserFromToken(c.Cookies("token"))
+	if err != nil {
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 	feedData := struct {
 		Link       string `json:"link"`
@@ -164,7 +186,6 @@ func (h *Handler) FollowFeed(c *fiber.Ctx) error {
 		Collection string `json:"collection"`
 	}{}
 	if err = c.BodyParser(&feedData); err != nil {
-		log.Error(err)
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	if feedData.Link == "" {
@@ -232,14 +253,10 @@ func (h *Handler) GetFollowedFeeds(c *fiber.Ctx) error {
 		log.Error(err)
 		return c.SendStatus(500)
 	}
-	token := c.Cookies("token")
-	if token == "" {
-		return c.Status(fiber.StatusInternalServerError).SendString("auth token empty")
-	}
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
 		log.Error(err)
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.SendStatus(http.StatusUnauthorized)
 	}
 	if body.Query == "" {
 		if err := db.Select(&feeds, "SELECT feeds.* FROM feeds JOIN feed_follows ff ON feeds.feed_id = ff.feed_id WHERE ff.user_id = ? ORDER BY title;", user.ID); err != nil {

@@ -7,8 +7,7 @@ import (
 )
 
 func (h *Handler) GetUser(c *fiber.Ctx) error {
-	token := c.Cookies("token")
-	user, err := h.GetUserFromToken(token)
+	user, err := h.GetUserFromToken(c.Cookies("token"))
 	if err != nil {
 		return c.SendStatus(http.StatusUnauthorized)
 	}
