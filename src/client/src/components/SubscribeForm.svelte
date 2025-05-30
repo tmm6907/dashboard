@@ -1,6 +1,6 @@
 <script>
     import { triggerAlert } from "$lib";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
     let feedQuery = $state(""); // Search query
     let feeds = $state([]); // Store fetched feeds
