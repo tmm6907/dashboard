@@ -2,13 +2,38 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"golang.org/x/net/html"
 )
 
-func GetOGImage(url string) (string, error) {
-	resp, err := http.Get(url)
+func GetOGImage(articleURL string) (string, error) {
+	client := &http.Client{
+		// Follow redirects manually
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			// Prevent automatic redirect so we can capture the real location
+			return http.ErrUseLastResponse
+		},
+	}
+	resp, err := client.Get(articleURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+		loc, err := resp.Location()
+		if err != nil {
+			return "", fmt.Errorf("redirect location error: %v", err)
+		}
+		articleURL = loc.String()
+	} else if resp.StatusCode != 200 {
+		return "", fmt.Errorf("failed to fetch URL, status: %d", resp.StatusCode)
+	}
+
+	// Step 2: Now fetch the real article page
+	resp, err = http.Get(articleURL)
 	if err != nil {
 		return "", err
 	}
