@@ -103,6 +103,7 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 	if err := c.BodyParser(&body); err != nil {
 		return c.SendStatus(500)
 	}
+	isYoutube := false
 
 	if body.URL != "" {
 		if utils.IsYoutubeChannelURL(body.URL) {
@@ -111,6 +112,7 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 				log.Error(err)
 				return c.Status(http.StatusInternalServerError).SendString(err.Error())
 			}
+			isYoutube = true
 			body.URL = link
 		}
 		rssParser := gofeed.NewParser()
@@ -126,6 +128,9 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 			} else {
 				log.Error(err)
 			}
+		}
+		if isYoutube {
+			feedData.Title = "YouTube | " + feedData.Title
 		}
 		data := map[string]any{
 			"title":       feedData.Title,
