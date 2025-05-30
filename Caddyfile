@@ -4,7 +4,7 @@
 
 
 mashboard.app {
-	encode gzip zstd br
+	encode gzip zstd
 
 	@cors_options method OPTIONS
 	handle @cors_options {
