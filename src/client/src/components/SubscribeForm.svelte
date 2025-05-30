@@ -85,7 +85,7 @@
 
     onMount(() => {
         const clickHandler = (ev) => {
-            const target = ev.target as HTMLElement;
+            const target = ev.target;
             if (target && target.matches(".follow-btn")) {
                 followFeed(target.id, target.dataset.feedname);
             }
