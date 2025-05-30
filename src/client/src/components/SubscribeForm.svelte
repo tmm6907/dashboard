@@ -133,7 +133,10 @@
                     </div>
                     <span>Create New Feed</span>
                 </button>
-                <div id="browse-feed-list" class="h-64 overflow-y-auto">
+                <div
+                    id="browse-feed-list"
+                    class="h-64 overflow-y-auto flex-col gap-y-1"
+                >
                     {#each feeds as feed}
                         <div
                             class="feed-row grid grid-cols-4 gap-y-1 items-center border-base-300 cursor-pointer"
