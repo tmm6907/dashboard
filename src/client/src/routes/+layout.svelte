@@ -63,7 +63,7 @@
 <div id="alert-container" class="absolute bottom-20 left-0 w-full z-20">
     <Alert />
 </div>
-{#if $page.url.pathname === "/login"}
+{#if page.url.pathname === "/login"}
     <SubscribeForm />
     <BottomNav />
 {/if}
