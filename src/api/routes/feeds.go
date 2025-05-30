@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -131,6 +132,7 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 		}
 		if isYoutube {
 			feedData.Title = "YouTube | " + feedData.Title
+			feedData.Description = fmt.Sprintf("%s YouTube channel", feedData.Title)
 		}
 		data := map[string]any{
 			"title":       feedData.Title,
