@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -46,7 +47,16 @@ func getFeedFromChannelID(channelID string) string {
 	return "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelID
 }
 
+func parseURL(urlpath string) string {
+	u, _ := url.Parse(urlpath)
+	if u != nil {
+		return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, u.Path)
+	}
+	return urlpath
+}
+
 func GetYouTubeRSS(channelURL string) (string, error) {
+	channelURL = parseURL(channelURL)
 	if strings.Contains(channelURL, "https://www.youtube.com/feeds/") {
 		return channelURL, nil
 	}
