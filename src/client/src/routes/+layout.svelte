@@ -6,6 +6,7 @@
     import Alert from "../components/Alert.svelte";
     import { profileData } from "$lib/state.svelte";
     import { triggerAlert } from "$lib";
+    import { page } from "$app/state";
 
     let { children } = $props();
     async function getProfileData() {
@@ -62,5 +63,7 @@
 <div id="alert-container" class="absolute bottom-20 left-0 w-full z-20">
     <Alert />
 </div>
-<SubscribeForm />
-<BottomNav />
+{#if $page.url.pathname === "/login"}
+    <SubscribeForm />
+    <BottomNav />
+{/if}
