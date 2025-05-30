@@ -131,8 +131,9 @@ func (h *Handler) SearchForNewFeedByURL(c *fiber.Ctx) error {
 			}
 		}
 		if isYoutube {
-			feedData.Title = "YouTube | " + feedData.Title
 			feedData.Description = fmt.Sprintf("%s YouTube channel", feedData.Title)
+			feedData.Title = "YouTube | " + feedData.Title
+
 		}
 		data := map[string]any{
 			"title":       feedData.Title,
