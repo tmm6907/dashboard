@@ -32,7 +32,9 @@
         }
     }
     onMount(async () => {
-        await getProfileData();
+        if (page.url.pathname !== "/login") {
+            await getProfileData();
+        }
     });
 </script>
 
