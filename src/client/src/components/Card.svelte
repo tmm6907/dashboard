@@ -15,7 +15,6 @@
         window.location.href = "/collections/" + item.id;
     };
     const bookmarkFeedItem = async () => {
-        console.log("entered");
         if (!item.id) {
             console.error("feed item id not found");
             return;
@@ -41,7 +40,6 @@
         }
     };
     onMount(() => {
-        console.log("card item:", item);
         const my_modal_2 = document.getElementById("my_modal_2");
     });
 </script>
