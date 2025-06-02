@@ -1,5 +1,5 @@
 <script>
-    import { triggerAlert } from "$lib";
+    import { loggedOutAlert, triggerAlert } from "$lib";
     import { onDestroy, onMount } from "svelte";
 
     let feedQuery = $state(""); // Search query
@@ -20,11 +20,7 @@
                 },
             );
             if (response.status == 401) {
-                triggerAlert("Not logged in", {
-                    type: "alert-error",
-                    closable: true,
-                });
-                window.location.href = "/login";
+                loggedOutAlert();
                 return;
             }
             console.log(response.status);
@@ -58,11 +54,7 @@
                 },
             );
             if (response.status == 401) {
-                triggerAlert("Not logged in", {
-                    type: "alert-error",
-                    closable: true,
-                });
-                window.location.href = "/login";
+                loggedOutAlert();
                 return;
             }
             if (response.ok) {

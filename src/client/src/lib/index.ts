@@ -17,12 +17,7 @@ export const fetchFeedItems = async (category): Promise<FeedData | undefined> =>
             credentials: "include",
         });
         if (response.status == 401) {
-            triggerAlert("Not logged in", {
-                type: "alert-error",
-                duration: 3000,
-                closable: true,
-            });
-            window.location.href = "https://mashboard.app/login"
+            loggedOutAlert();
             return;
         }
         console.log(response.status)
@@ -81,6 +76,7 @@ export interface AlertConfig {
     type: string;
     duration: number;
     closable: boolean;
+    action: CallableFunction;
 }
 
 
@@ -102,5 +98,21 @@ export const triggerAlert = (msg: string, config: AlertConfig) => {
     setTimeout(() => {
         console.log("closing");
         alertState.showAlert = false;
+        if (typeof config.action === 'function') {
+            config.action()
+        }
     }, alertState.duration);
+}
+
+export const loggedOutAlert = (msg: string = "Not logged in!") => {
+    triggerAlert(
+        msg,
+        {
+            type: "alert-error",
+            closable: true,
+            action: () => {
+                window.location.href = "/login";
+            },
+        }
+    )
 }

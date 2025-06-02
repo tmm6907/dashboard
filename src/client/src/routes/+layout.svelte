@@ -5,7 +5,7 @@
     import "../global.css";
     import Alert from "../components/Alert.svelte";
     import { profileData } from "$lib/state.svelte";
-    import { triggerAlert } from "$lib";
+    import { loggedOutAlert, triggerAlert } from "$lib";
     import { page } from "$app/state";
 
     let { children } = $props();
@@ -15,12 +15,8 @@
                 credentials: "include",
             });
             if (response.status == 401) {
-                console.error("Not logged in");
-                triggerAlert("Not logged in", {
-                    type: "alert-error",
-                    duration: 3000,
-                    closable: true,
-                });
+                loggedOutAlert();
+                return;
             }
             if (response.status != 200) {
                 let err = await response.text();

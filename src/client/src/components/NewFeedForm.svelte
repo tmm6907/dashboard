@@ -1,5 +1,5 @@
 <script>
-    import { getTimeAgoAll, triggerAlert } from "$lib";
+    import { getTimeAgoAll, loggedOutAlert, triggerAlert } from "$lib";
     import { onMount } from "svelte";
 
     // @ts-ignore
@@ -70,13 +70,19 @@
             headers: { "Content-Type": "application/json" },
             body: body,
         }).then(async (resp) => {
+            if (resp.status == 401) {
+                loggedOutAlert();
+                return;
+            }
             if (resp.status == 200) {
                 let my_modal_2 = document.getElementById("my_modal_2");
                 my_modal_2.style.display = "none";
-                triggerAlert("Followed " + formData.get("title"), {
+                triggerAlert(`Followed ${formData.get("title")}`, {
                     type: "alert-success",
+                    action: () => {
+                        window.location.href = "/";
+                    },
                 });
-                window.location.href = "/";
             }
             let err = await resp.text();
             triggerAlert("Failed to follow " + formData.get("title"), {
